@@ -66,7 +66,7 @@ const recentPosts = allPosts
 
     <!-- 侧边栏 -->
     <aside class="sidebar">
-      <!-- 目录卡片 -->
+      <!-- 目录卡片 (可选) -->
       {headings && headings.length > 0 && (
         <div class="sidebar-widget glass-card">
           <div class="widget-title">文章目录</div>
@@ -82,7 +82,7 @@ const recentPosts = allPosts
         </div>
       )}
 
-      <!-- 文章信息卡片 -->
+      <!-- 文章信息卡片 (始终显示) -->
       <div class="sidebar-widget glass-card">
         <div class="widget-title">元数据</div>
         <div class="meta-list">
@@ -98,12 +98,12 @@ const recentPosts = allPosts
           )}
           <div class="meta-group">
             <div class="meta-label">预计阅读</div>
-            <div class="read-time">~{Math.ceil(frontmatter.content?.length / 500 || 5)} 分钟</div>
+            <div class="read-time">~{Math.ceil((frontmatter.content?.length || 1000) / 500)} 分钟</div>
           </div>
         </div>
       </div>
 
-      <!-- 最新文章卡片 -->
+      <!-- 最新文章卡片 (始终显示) -->
       <div class="sidebar-widget glass-card">
         <div class="widget-title">最新传输</div>
         <ul class="recent-posts">
@@ -482,7 +482,14 @@ const recentPosts = allPosts
     }
 
     .sidebar {
-      display: none; /* 在平板尺寸下隐藏侧边栏，或者可以移到底部 */
+      display: flex; /* 强制显示侧边栏，改为放置在底部或调整布局 */
+      flex-direction: row;
+      flex-wrap: wrap;
+      position: static;
+    }
+    
+    .sidebar-widget {
+      flex: 1 1 300px;
     }
   }
 
@@ -497,6 +504,10 @@ const recentPosts = allPosts
 
     .post-content {
       padding: 1.5rem;
+    }
+    
+    .sidebar {
+      flex-direction: column;
     }
   }
 </style>
