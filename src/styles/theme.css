@@ -1,0 +1,65 @@
+:root {
+  /* 背景色 (Background) */
+  --color-bg-start: #F8FAFC;
+  --color-bg-end: #FFFFFF;
+  
+  /* 主色调 (Primary): 青色/天蓝渐变 */
+  --color-primary-start: #06B6D4;
+  --color-primary-end: #3B82F6;
+  
+  /* 强调色 (Accent) */
+  --color-accent: #22D3EE;
+  --color-accent-light: #A5F3FC;
+  
+  /* 点缀色 (Neutral) */
+  --color-neutral: #9CA3AF;
+  --color-neutral-light: #D1D5DB;
+  --color-neutral-dark: #4B5563;
+  
+  /* 文字色 */
+  --color-text-title: #1E3A8A;
+  --color-text-body: #4B5563;
+  --color-text-code: #3B82F6;
+  
+  /* 字体 */
+  --font-sans: 'Inter', 'Roboto', 'Nunito Sans', system-ui, sans-serif;
+  --font-mono: 'Source Code Pro', 'IBM Plex Mono', monospace;
+  
+  /* 玻璃拟态 - 升级版 */
+  --glass-bg: rgba(255, 255, 255, 0.65); /* 更通透 */
+  --glass-border: 1px solid rgba(255, 255, 255, 0.4); /* 白色半透明边框 */
+  --glass-shadow: 
+    0 4px 6px rgba(0, 0, 0, 0.02), 
+    0 10px 15px rgba(0, 0, 0, 0.03),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.5); /* 内发光，增加厚度感 */
+  --glass-blur: blur(12px); /* 更强的模糊，营造磨砂感 */
+}
+
+body {
+  background: linear-gradient(135deg, #F0F4F8, #FFFFFF); /* 微调背景，更冷一点 */
+  color: var(--color-text-body);
+  font-family: var(--font-sans);
+  margin: 0;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-text-title);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+code, pre, .font-mono {
+  font-family: var(--font-mono);
+  color: var(--color-text-code);
+}
+
+/* 玻璃拟态卡片工具类 */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: 8px;
+}

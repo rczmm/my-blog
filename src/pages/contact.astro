@@ -1,157 +1,184 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import AetherLayout from '../layouts/AetherLayout.astro';
 ---
 
-<BaseLayout title="联系我 - 我的博客">
+<AetherLayout title="联系 - Aether Lab">
   <div class="contact-container">
     <!-- 页面头部 -->
-    <header class="contact-header">
-      <h1>📮 联系我</h1>
+    <header class="contact-header glass-card">
+      <h1>建立连接</h1>
       <p class="contact-subtitle">
-        很高兴与您交流！无论是技术讨论、项目合作还是其他任何话题，都欢迎联系我。
+        &gt; 正在初始化通讯协议...<br/>
+        &gt; 欢迎进行技术探讨与合作交流。
       </p>
     </header>
 
     <div class="contact-content">
       <!-- 联系方式卡片 -->
       <section class="contact-methods">
-        <h2>📞 联系方式</h2>
+        <div class="section-title">通讯节点</div>
         <div class="methods-grid">
-          <a href="mailto:your.email@example.com" class="contact-card email">
-            <div class="card-icon">📧</div>
+          <a href="mailto:your.email@example.com" class="contact-card glass-card email">
+            <div class="card-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            </div>
             <div class="card-content">
-              <h3>邮箱</h3>
+              <h3>电子邮箱</h3>
               <p>your.email@example.com</p>
-              <span class="card-action">发送邮件</span>
+              <span class="card-action">发送邮件 &gt;</span>
             </div>
           </a>
 
-          <a href="https://github.com/yourusername" class="contact-card github" target="_blank">
-            <div class="card-icon">🐙</div>
+          <a href="https://github.com/yourusername" class="contact-card glass-card github" target="_blank">
+            <div class="card-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+            </div>
             <div class="card-content">
-              <h3>GitHub</h3>
+              <h3>GitHub 仓库</h3>
               <p>@yourusername</p>
-              <span class="card-action">访问主页</span>
+              <span class="card-action">查看代码 &gt;</span>
             </div>
           </a>
 
-          <a href="https://twitter.com/yourusername" class="contact-card twitter" target="_blank">
-            <div class="card-icon">🐦</div>
+          <a href="https://twitter.com/yourusername" class="contact-card glass-card twitter" target="_blank">
+            <div class="card-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+            </div>
             <div class="card-content">
-              <h3>Twitter</h3>
+              <h3>Twitter 动态</h3>
               <p>@yourusername</p>
-              <span class="card-action">关注我</span>
+              <span class="card-action">关注动态 &gt;</span>
             </div>
           </a>
 
-          <a href="https://www.linkedin.com/in/yourusername" class="contact-card linkedin" target="_blank">
-            <div class="card-icon">💼</div>
+          <a href="https://www.linkedin.com/in/yourusername" class="contact-card glass-card linkedin" target="_blank">
+            <div class="card-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+            </div>
             <div class="card-content">
-              <h3>LinkedIn</h3>
-              <p>专业档案</p>
-              <span class="card-action">查看资料</span>
+              <h3>LinkedIn 档案</h3>
+              <p>Professional Data</p>
+              <span class="card-action">建立联系 &gt;</span>
             </div>
           </a>
         </div>
       </section>
 
       <!-- 留言表单 -->
-      <section class="message-form">
-        <h2>💬 发送消息</h2>
+      <section class="message-form glass-card">
+        <div class="section-title">直接联络</div>
         <form class="contact-form" id="contactForm">
-          <div class="form-group">
-            <label for="name">姓名 *</label>
-            <input type="text" id="name" name="name" required>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name">访客代号 (ID) *</label>
+              <input type="text" id="name" name="name" placeholder="请输入您的称呼" required>
+            </div>
+
+            <div class="form-group">
+              <label for="email">回传地址 (Email) *</label>
+              <input type="email" id="email" name="email" placeholder="请输入您的邮箱" required>
+            </div>
           </div>
 
           <div class="form-group">
-            <label for="email">邮箱 *</label>
-            <input type="email" id="email" name="email" required>
+            <label for="subject">通讯主题 *</label>
+            <input type="text" id="subject" name="subject" placeholder="请输入主题" required>
           </div>
 
           <div class="form-group">
-            <label for="subject">主题 *</label>
-            <input type="text" id="subject" name="subject" required>
-          </div>
-
-          <div class="form-group">
-            <label for="message">消息内容 *</label>
-            <textarea id="message" name="message" rows="6" required></textarea>
+            <label for="message">数据载荷 (内容) *</label>
+            <textarea id="message" name="message" rows="6" placeholder="请输入详细内容..." required></textarea>
           </div>
 
           <button type="submit" class="submit-btn">
-            <span class="btn-text">发送消息</span>
-            <span class="btn-icon">📤</span>
+            <span class="btn-text">初始化传输</span>
+            <span class="btn-icon">➜</span>
           </button>
         </form>
       </section>
 
       <!-- FAQ 部分 -->
-      <section class="faq-section">
-        <h2>❓ 常见问题</h2>
+      <section class="faq-section glass-card">
+        <div class="section-title">常见问题数据库</div>
         <div class="faq-list">
           <details class="faq-item">
-            <summary>你多久回复一次邮件？</summary>
+            <summary>
+              <span class="faq-q">Q: 平均响应时间？</span>
+              <span class="faq-icon">+</span>
+            </summary>
             <div class="faq-content">
-              <p>我通常在24-48小时内回复邮件。如果是紧急事务，请在邮件标题中注明"紧急"。</p>
+              <p>&gt; 系统通常在 24-48 小时内响应。紧急信号将优先处理。</p>
             </div>
           </details>
 
           <details class="faq-item">
-            <summary>可以请你做项目咨询吗？</summary>
+            <summary>
+              <span class="faq-q">Q: 接受项目咨询吗？</span>
+              <span class="faq-icon">+</span>
+            </summary>
             <div class="faq-content">
-              <p>当然可以！我很乐意讨论技术项目和提供建议。请详细描述您的项目需求。</p>
+              <p>&gt; 确认。系统已准备好进行技术分析和咨询。请输入项目参数以进行评估。</p>
             </div>
           </details>
 
           <details class="faq-item">
-            <summary>你接受客座博客写作吗？</summary>
+            <summary>
+              <span class="faq-q">Q: 接受客座文章吗？</span>
+              <span class="faq-icon">+</span>
+            </summary>
             <div class="faq-content">
-              <p>我很乐意为高质量的技术博客撰写客座文章。请通过邮件联系我讨论具体细节。</p>
+              <p>&gt; 允许接入高质量数据流。请通过邮件通道提交内容包以供审核。</p>
             </div>
           </details>
 
           <details class="faq-item">
-            <summary>如何订阅你的博客更新？</summary>
+            <summary>
+              <span class="faq-q">Q: 订阅状态？</span>
+              <span class="faq-icon">+</span>
+            </summary>
             <div class="faq-content">
-              <p>目前可以通过关注我的社交媒体账号来获取更新通知。RSS 功能正在开发中。</p>
+              <p>&gt; RSS 模块目前正在开发中。请监控社交频率以获取更新。</p>
             </div>
           </details>
         </div>
       </section>
 
       <!-- 位置信息 -->
-      <section class="location-section">
-        <h2>📍 位置信息</h2>
-        <div class="location-card">
-          <div class="location-info">
-            <div class="location-item">
-              <span class="location-icon">🌍</span>
-              <div>
-                <h3>当前位置</h3>
-                <p>中国·北京</p>
-              </div>
+      <section class="location-section glass-card">
+        <div class="section-title">地理坐标</div>
+        <div class="location-info">
+          <div class="location-item">
+            <div class="location-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
             </div>
-            <div class="location-item">
-              <span class="location-icon">⏰</span>
-              <div>
-                <h3>时区</h3>
-                <p>UTC+8 (北京时间)</p>
-              </div>
+            <div>
+              <h3>当前位置</h3>
+              <p>中国·北京 [Sector 8]</p>
             </div>
-            <div class="location-item">
-              <span class="location-icon">🌐</span>
-              <div>
-                <h3>语言</h3>
-                <p>中文、English</p>
-              </div>
+          </div>
+          <div class="location-item">
+            <div class="location-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            </div>
+            <div>
+              <h3>时区</h3>
+              <p>UTC+8 (CST)</p>
+            </div>
+          </div>
+          <div class="location-item">
+            <div class="location-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            </div>
+            <div>
+              <h3>语言协议</h3>
+              <p>中文 / English</p>
             </div>
           </div>
         </div>
       </section>
     </div>
   </div>
-</BaseLayout>
+</AetherLayout>
 
 <style>
   .contact-container {
@@ -454,7 +481,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         // 这里可以添加表单提交逻辑
         // 例如发送到后端API或第三方服务
         
-        alert('谢谢您的消息！我会尽快回复您。');
+        alert('TRANSMISSION_COMPLETE: Message packet sent successfully.');
         form.reset();
       });
     }

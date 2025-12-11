@@ -108,6 +108,14 @@ function formatDate(date: string) {
         );
       })}
     </section>
+
+    {sortedTags.length === 0 && (
+      <div class="empty-state glass-card">
+        <div class="empty-icon">🏷️</div>
+        <h2>NO_TAGS_FOUND</h2>
+        <p>System database empty. Initialize new data packets with tags.</p>
+      </div>
+    )}
   </div>
 </AetherLayout>
 
@@ -329,6 +337,29 @@ function formatDate(date: string) {
     transform: translateX(5px);
   }
 
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--color-neutral);
+  }
+
+  .empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+  }
+
+  .empty-state h2 {
+    margin: 0 0 1rem 0;
+    color: var(--color-text-title);
+    font-family: var(--font-mono);
+  }
+
+  .empty-state p {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+
   @media (max-width: 768px) {
     .tag-header {
       flex-direction: column;
@@ -344,253 +375,6 @@ function formatDate(date: string) {
 
     .post-status, .post-arrow {
       display: none;
-    }
-  }
-</style>
-                        </time>
-                        {post.frontmatter.author && (
-                          <span class="post-author">
-                            👤 {post.frontmatter.author}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </section>
-
-    {sortedTags.length === 0 && (
-      <div class="empty-state">
-        <div class="empty-icon">🏷️</div>
-        <h2>暂无标签</h2>
-        <p>还没有任何标签，开始创建文章并添加标签吧！</p>
-      </div>
-    )}
-  </div>
-</BaseLayout>
-
-<style>
-  .tags-container {
-    max-width: 900px;
-    margin: 0 auto;
-  }
-
-  .tags-header {
-    text-align: center;
-    margin-bottom: 3rem;
-    padding: 2rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 12px;
-    color: white;
-  }
-
-  .tags-header h1 {
-    margin: 0 0 1rem 0;
-    font-size: 2.5rem;
-    font-weight: 700;
-  }
-
-  .tags-stats {
-    margin: 0;
-    font-size: 1.1rem;
-    opacity: 0.9;
-  }
-
-  .tags-stats strong {
-    font-weight: 600;
-  }
-
-  .tag-cloud-section {
-    background: white;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-    margin-bottom: 3rem;
-    border: 1px solid #e2e8f0;
-  }
-
-  .tag-cloud-section h2 {
-    margin: 0 0 1.5rem 0;
-    color: #2d3748;
-    font-size: 1.5rem;
-  }
-
-  .tag-cloud {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    align-items: center;
-    justify-content: center;
-    min-height: 200px;
-  }
-
-  .tag-cloud-item {
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: baseline;
-    gap: 0.25rem;
-    padding: 0.5rem;
-    border-radius: 8px;
-  }
-
-  .tag-cloud-item:hover {
-    transform: scale(1.1);
-    background: rgba(0, 0, 0, 0.05);
-  }
-
-  .tag-count {
-    font-size: 0.8rem;
-    opacity: 0.7;
-  }
-
-  .tags-detail h2 {
-    margin: 0 0 2rem 0;
-    color: #2d3748;
-    font-size: 1.8rem;
-  }
-
-  .tag-section {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-    margin-bottom: 2rem;
-    overflow: hidden;
-    border: 1px solid #e2e8f0;
-  }
-
-  .tag-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem;
-    background: #f7fafc;
-    border-bottom: 1px solid #e2e8f0;
-  }
-
-  .tag-title {
-    margin: 0;
-    font-size: 1.4rem;
-    font-weight: 600;
-  }
-
-  .tag-count-badge {
-    background: #edf2f7;
-    color: #4a5568;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    font-weight: 500;
-  }
-
-  .tag-posts {
-    padding: 1rem;
-  }
-
-  .tag-post-item {
-    border-bottom: 1px solid #e2e8f0;
-    padding: 1rem 0;
-    transition: all 0.2s ease;
-  }
-
-  .tag-post-item:last-child {
-    border-bottom: none;
-  }
-
-  .tag-post-item:hover {
-    background: #f7fafc;
-    margin: 0 -1rem;
-    padding: 1rem;
-    border-radius: 8px;
-  }
-
-  .post-title {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.2rem;
-    line-height: 1.3;
-  }
-
-  .post-title a {
-    color: #2d3748;
-    text-decoration: none;
-    transition: color 0.2s ease;
-  }
-
-  .post-title a:hover {
-    color: #3182ce;
-  }
-
-  .post-description {
-    color: #718096;
-    line-height: 1.6;
-    margin: 0 0 0.75rem 0;
-    font-size: 0.95rem;
-  }
-
-  .post-meta {
-    display: flex;
-    gap: 1rem;
-    font-size: 0.875rem;
-    color: #a0aec0;
-    flex-wrap: wrap;
-  }
-
-  .empty-state {
-    text-align: center;
-    padding: 4rem 2rem;
-    color: #718096;
-  }
-
-  .empty-icon {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-  }
-
-  .empty-state h2 {
-    margin: 0 0 1rem 0;
-    color: #2d3748;
-  }
-
-  .empty-state p {
-    margin: 0;
-    font-size: 1.1rem;
-  }
-
-  @media (max-width: 768px) {
-    .tags-header {
-      padding: 1.5rem;
-      margin-left: -1rem;
-      margin-right: -1rem;
-      border-radius: 0;
-    }
-
-    .tags-header h1 {
-      font-size: 2rem;
-    }
-
-    .tag-cloud-section {
-      padding: 1.5rem;
-    }
-
-    .tag-cloud {
-      min-height: 150px;
-    }
-
-    .tag-header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 1rem;
-    }
-
-    .post-meta {
-      flex-direction: column;
-      gap: 0.5rem;
     }
   }
 </style>

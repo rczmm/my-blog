@@ -1,0 +1,134 @@
+---
+import AetherParticles from '../components/AetherParticles.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/theme.css';
+
+export interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="generator" content={Astro.generator} />
+  <title>{title} | Aether Lab</title>
+  
+  <!-- 引入 Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- 背景粒子层 -->
+  <AetherParticles />
+
+  <!-- HUD: 左上角状态栏 -->
+  <div class="hud-status">
+    <span class="hud-text">[Aether Lab | Status: <span class="status-online">Online</span>]</span>
+  </div>
+
+  <!-- HUD: 右下角数据读数 -->
+  <div class="hud-data">
+    <div class="data-row">
+      <span class="label">SYS.TEMP</span>
+      <span class="value">22.5°C</span>
+    </div>
+    <div class="data-row">
+      <span class="label">NET.NODES</span>
+      <span class="value" id="node-count">80</span>
+    </div>
+  </div>
+
+  <!-- 主容器 -->
+  <div class="app-container">
+    <Header />
+    
+    <main class="main-content">
+      <slot />
+    </main>
+    
+    <Footer />
+  </div>
+
+  <style>
+    /* 全局重置与基础样式在 theme.css 中 */
+
+    /* HUD 样式 */
+    .hud-status {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 100;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--color-neutral);
+      pointer-events: none;
+      border-bottom: 1px dashed var(--color-neutral-light);
+      padding-bottom: 5px;
+    }
+
+    .status-online {
+      color: var(--color-primary-start);
+      text-shadow: 0 0 5px var(--color-primary-start);
+      animation: pulse 2s infinite;
+    }
+
+    .hud-data {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 100;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--color-neutral);
+      pointer-events: none;
+      text-align: right;
+    }
+
+    .data-row {
+      margin-bottom: 4px;
+    }
+
+    .data-row .label {
+      opacity: 0.7;
+      margin-right: 8px;
+    }
+
+    .data-row .value {
+      color: var(--color-text-code);
+      font-weight: bold;
+    }
+
+    /* 布局容器 */
+    .app-container {
+      position: relative;
+      z-index: 1; /* 确保在粒子之上 */
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 40px 0;
+    }
+
+    /* 简单的脉冲动画 */
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+  </style>
+</body>
+</html>
