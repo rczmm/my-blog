@@ -1,315 +1,492 @@
 ---
-// 博客轮播图组件
+// 全息数据展示台 (Holographic Data Deck)
 export interface Props {
   posts: any[];
 }
 
 const { posts } = Astro.props;
-const featuredPosts = posts.slice(0, 3); // 取前3篇文章作为轮播
+const featuredPosts = posts.slice(0, 3); // 取前3篇文章作为精选
 ---
 
-<section class="blog-carousel">
-  <div class="carousel-container">
-    <h2 class="carousel-title">✨ 精选文章</h2>
-    
-    <div class="carousel-wrapper">
-      <div class="carousel-track" id="carouselTrack">
+<section class="hologram-deck">
+  <div class="deck-header">
+    <div class="header-line"></div>
+    <h2 class="deck-title">FEATURED_LOGS</h2>
+    <div class="header-line"></div>
+  </div>
+  
+  <div class="deck-container">
+    <!-- 左侧：全息投影封面 -->
+    <div class="hologram-visual">
+      <div class="scan-line"></div>
+      <div class="visual-content">
+        <div class="visual-icon">⚛</div>
+        <div class="visual-circle"></div>
+        <div class="visual-circle inner"></div>
+      </div>
+      <div class="visual-data">
+        <span>SCANNING...</span>
+        <span id="scan-progress">100%</span>
+      </div>
+    </div>
+
+    <!-- 右侧：数据面板 -->
+    <div class="data-panel">
+      <div class="panel-track" id="panelTrack">
         {featuredPosts.map((post, index) => (
-          <div class="carousel-slide" data-slide={index}>
-            <div class="slide-content">
-              <div class="slide-image">
-                <div class="image-placeholder">
-                  📄
-                  {post.frontmatter.tags && post.frontmatter.tags[0] && (
-                    <span class="category-badge">{post.frontmatter.tags[0]}</span>
-                  )}
-                </div>
-              </div>
-              
-              <div class="slide-info">
-                <h3 class="slide-title">
-                  <a href={post.url}>{post.frontmatter.title}</a>
-                </h3>
-                
-                <p class="slide-description">
-                  {post.frontmatter.description}
-                </p>
-                
-                <div class="slide-meta">
-                  <time class="slide-date">
-                    📅 {new Date(post.frontmatter.pubDate).toLocaleDateString('zh-CN')}
-                  </time>
-                  
-                  <span class="slide-author">
-                    👤 {post.frontmatter.author}
-                  </span>
-                </div>
-                
-                <a href={post.url} class="slide-link">
-                  阅读全文 →
-                </a>
+          <div class="panel-slide" data-slide={index}>
+            <div class="slide-header">
+              <span class="slide-id">LOG_00{index + 1}</span>
+              <div class="slide-tags">
+                {post.frontmatter.tags && post.frontmatter.tags.map((tag: string) => (
+                  <span class="tag-bracket">[{tag}]</span>
+                ))}
               </div>
             </div>
+
+            <h3 class="slide-title">
+              <a href={post.url}>{post.frontmatter.title}</a>
+            </h3>
+            
+            <div class="slide-meta-grid">
+              <div class="meta-item">
+                <span class="meta-label">AUTHOR</span>
+                <span class="meta-value">{post.frontmatter.author || 'SYSTEM'}</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">DATE</span>
+                <span class="meta-value">{new Date(post.frontmatter.pubDate).toLocaleDateString('zh-CN')}</span>
+              </div>
+            </div>
+
+            <p class="slide-description">
+              &gt; {post.frontmatter.description}
+              <span class="cursor">_</span>
+            </p>
+            
+            <a href={post.url} class="access-btn">
+              ACCESS_DATA
+            </a>
           </div>
         ))}
       </div>
-      
-      <!-- 轮播指示器 -->
-      <div class="carousel-indicators">
-        {featuredPosts.map((_, index) => (
-          <button 
-            class={`indicator ${index === 0 ? 'active' : ''}`}
-            data-slide={index}
-          ></button>
-        ))}
+
+      <!-- 控制器 -->
+      <div class="deck-controls">
+        <div class="progress-bar">
+          <div class="progress-fill" id="deckProgress"></div>
+        </div>
+        <div class="nav-buttons">
+          <button class="deck-btn prev-btn" id="prevBtn">&lt;</button>
+          <span class="current-index" id="currentIndex">01</span>
+          <span class="divider">/</span>
+          <span class="total-index">0{featuredPosts.length}</span>
+          <button class="deck-btn next-btn" id="nextBtn">&gt;</button>
+        </div>
       </div>
-      
-      <!-- 轮播控制按钮 -->
-      <button class="carousel-btn prev-btn" id="prevBtn">‹</button>
-      <button class="carousel-btn next-btn" id="nextBtn">›</button>
     </div>
   </div>
 </section>
 
 <style>
-  .blog-carousel {
-    margin: 2rem 0 3rem;
+  .hologram-deck {
+    margin: 2rem 0 4rem;
+    font-family: var(--font-mono);
   }
 
-  .carousel-title {
-    text-align: center;
-    font-size: 2rem;
-    margin-bottom: 2rem;
-    color: #2c3e50;
-    font-weight: 700;
-  }
-
-  .carousel-wrapper {
-    position: relative;
-    overflow: hidden;
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    background: white;
-  }
-
-  .carousel-track {
+  .deck-header {
     display: flex;
-    transition: transform 0.5s ease-in-out;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
   }
 
-  .carousel-slide {
-    min-width: 100%;
+  .header-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--color-primary-start), transparent);
   }
 
-  .slide-content {
+  .deck-title {
+    font-size: 1.2rem;
+    letter-spacing: 0.2em;
+    color: var(--color-neutral);
+    margin: 0;
+  }
+
+  .deck-container {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 300px 1fr;
+    gap: 2rem;
     min-height: 400px;
+    position: relative;
   }
 
-  .slide-image {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  /* 左侧全息视觉 */
+  .hologram-visual {
     position: relative;
+    border: 1px solid var(--color-primary-start);
+    background: rgba(6, 182, 212, 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .hologram-visual::before, .hologram-visual::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--color-primary-start);
+    transition: all 0.3s;
+  }
+
+  .hologram-visual::before { top: 0; left: 0; border-right: none; border-bottom: none; }
+  .hologram-visual::after { bottom: 0; right: 0; border-left: none; border-top: none; }
+
+  .visual-content {
+    position: relative;
+    width: 150px;
+    height: 150px;
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  .visual-icon {
     font-size: 4rem;
-    color: white;
+    color: var(--color-primary-end);
+    z-index: 2;
+    animation: float 3s ease-in-out infinite;
   }
 
-  .category-badge {
+  .visual-circle {
     position: absolute;
-    top: 1rem;
-    left: 1rem;
-    background: rgba(255,255,255,0.2);
-    backdrop-filter: blur(10px);
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
+    border: 1px dashed var(--color-primary-start);
+    border-radius: 50%;
+    width: 100%;
+    height: 100%;
+    animation: spin 10s linear infinite;
   }
 
-  .slide-info {
-    padding: 2rem;
+  .visual-circle.inner {
+    width: 70%;
+    height: 70%;
+    border-style: solid;
+    border-color: rgba(6, 182, 212, 0.3);
+    animation: spin 5s linear infinite reverse;
+  }
+
+  .scan-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--color-primary-light);
+    box-shadow: 0 0 10px var(--color-primary-light);
+    animation: scan 2s linear infinite;
+    z-index: 1;
+  }
+
+  .visual-data {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    font-size: 0.7rem;
+    color: var(--color-primary-start);
+  }
+
+  /* 右侧数据面板 */
+  .data-panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+  }
+
+  .panel-track {
+    position: relative;
+    flex: 1;
+  }
+
+  .panel-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 1rem;
   }
 
-  .slide-title {
-    margin: 0;
-    font-size: 1.8rem;
-    line-height: 1.2;
+  .panel-slide.active {
+    opacity: 1;
+    pointer-events: all;
   }
 
-  .slide-title a {
-    color: #2c3e50;
-    text-decoration: none;
-    transition: color 0.3s ease;
-  }
-
-  .slide-title a:hover {
-    color: #3498db;
-  }
-
-  .slide-description {
-    color: #7f8c8d;
-    line-height: 1.6;
-    margin: 0;
-    font-size: 1.1rem;
-  }
-
-  .slide-meta {
+  .slide-header {
     display: flex;
-    gap: 1rem;
-    font-size: 0.9rem;
-    color: #95a5a6;
-    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    font-size: 0.8rem;
+    color: var(--color-neutral);
   }
 
-  .slide-link {
-    color: #3498db;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 1.1rem;
-    transition: all 0.3s ease;
-    align-self: flex-start;
+  .slide-id {
+    color: var(--color-primary-start);
   }
 
-  .slide-link:hover {
-    color: #2980b9;
-    transform: translateX(5px);
-  }
-
-  .carousel-indicators {
-    position: absolute;
-    bottom: 1rem;
-    left: 50%;
-    transform: translateX(-50%);
+  .slide-tags {
     display: flex;
     gap: 0.5rem;
   }
 
-  .indicator {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    border: none;
-    background: rgba(255,255,255,0.5);
-    cursor: pointer;
-    transition: all 0.3s ease;
+  .tag-bracket {
+    color: var(--color-text-code);
   }
 
-  .indicator.active {
-    background: white;
-    transform: scale(1.2);
+  .slide-title {
+    font-size: 2.5rem;
+    margin: 0 0 2rem;
+    line-height: 1.2;
+    font-family: var(--font-sans);
   }
 
-  .carousel-btn {
+  .slide-title a {
+    color: var(--color-text-title);
+    text-decoration: none;
+    background: linear-gradient(to right, var(--color-text-title) 50%, var(--color-primary-start) 50%);
+    background-size: 200% 100%;
+    background-position: 0 0;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: background-position 0.3s ease;
+  }
+
+  .slide-title a:hover {
+    background-position: -100% 0;
+  }
+
+  .slide-meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    border-top: 1px solid var(--color-neutral-light);
+    border-bottom: 1px solid var(--color-neutral-light);
+    padding: 1rem 0;
+  }
+
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .meta-label {
+    font-size: 0.7rem;
+    color: var(--color-neutral);
+    margin-bottom: 0.2rem;
+  }
+
+  .meta-value {
+    font-size: 0.9rem;
+    color: var(--color-text-body);
+    font-weight: 600;
+  }
+
+  .slide-description {
+    font-size: 1rem;
+    color: var(--color-text-body);
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    max-width: 80%;
+  }
+
+  .cursor {
+    display: inline-block;
+    width: 8px;
+    height: 15px;
+    background: var(--color-primary-start);
+    animation: blink 1s step-end infinite;
+  }
+
+  .access-btn {
+    display: inline-block;
+    padding: 0.8rem 2rem;
+    border: 1px solid var(--color-primary-start);
+    color: var(--color-primary-start);
+    text-decoration: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    transition: all 0.3s;
+    align-self: flex-start;
+  }
+
+  .access-btn:hover {
+    background: rgba(6, 182, 212, 0.1);
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+  }
+
+  /* 控制器样式 */
+  .deck-controls {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .progress-bar {
+    flex: 1;
+    height: 2px;
+    background: var(--color-neutral-light);
+    position: relative;
+  }
+
+  .progress-fill {
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(255,255,255,0.9);
-    border: none;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    font-size: 1.5rem;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: var(--color-primary-start);
+    width: 33%; /* 初始值 */
+    transition: width 0.3s ease;
+  }
+
+  .nav-buttons {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.9rem;
+    color: var(--color-text-code);
+  }
+
+  .deck-btn {
+    background: none;
+    border: 1px solid var(--color-neutral-light);
+    color: var(--color-text-body);
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    z-index: 10;
+    transition: all 0.2s;
   }
 
-  .carousel-btn:hover {
-    background: white;
-    transform: translateY(-50%) scale(1.1);
+  .deck-btn:hover {
+    border-color: var(--color-primary-start);
+    color: var(--color-primary-start);
   }
 
-  .prev-btn {
-    left: 1rem;
+  .divider {
+    color: var(--color-neutral);
+    margin: 0 0.5rem;
   }
 
-  .next-btn {
-    right: 1rem;
+  /* 动画 */
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
   }
 
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  @keyframes scan {
+    0% { top: 0; opacity: 0; }
+    50% { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+  }
+
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+
+  /* 响应式 */
   @media (max-width: 768px) {
-    .slide-content {
+    .deck-container {
       grid-template-columns: 1fr;
+      min-height: auto;
     }
 
-    .slide-image {
-      min-height: 200px;
-    }
-
-    .slide-info {
-      padding: 1.5rem;
+    .hologram-visual {
+      display: none;
     }
 
     .slide-title {
-      font-size: 1.4rem;
+      font-size: 1.8rem;
     }
-
-    .carousel-btn {
-      width: 40px;
-      height: 40px;
-      font-size: 1.2rem;
+    
+    .panel-slide {
+        position: relative;
+        display: none;
     }
-
-    .prev-btn {
-      left: 0.5rem;
-    }
-
-    .next-btn {
-      right: 0.5rem;
+    
+    .panel-slide.active {
+        display: flex;
     }
   }
 </style>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const track = document.getElementById('carouselTrack');
-    const indicators = document.querySelectorAll('.indicator');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
+  // 轮播逻辑
+  const slides = document.querySelectorAll('.panel-slide');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const currentIndexEl = document.getElementById('currentIndex');
+  const progressBar = document.getElementById('deckProgress');
+  
+  let currentSlide = 0;
+  const totalSlides = slides.length;
+
+  function updateSlide(index: number) {
+    // 隐藏所有
+    slides.forEach(slide => slide.classList.remove('active'));
     
-    if (!track || !indicators.length || !prevBtn || !nextBtn) return;
+    // 显示当前
+    slides[index].classList.add('active');
     
-    let currentSlide = 0;
-    const totalSlides = indicators.length;
-    
-    function updateCarousel() {
-      track.style.transform = `translateX(-${currentSlide * 100}%)`;
-      
-      indicators.forEach((indicator, index) => {
-        indicator.classList.toggle('active', index === currentSlide);
-      });
+    // 更新数字
+    if (currentIndexEl) {
+      currentIndexEl.textContent = `0${index + 1}`;
     }
     
-    function nextSlide() {
-      currentSlide = (currentSlide + 1) % totalSlides;
-      updateCarousel();
+    // 更新进度条
+    if (progressBar) {
+      progressBar.style.width = `${((index + 1) / totalSlides) * 100}%`;
     }
-    
-    function prevSlide() {
-      currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
-      updateCarousel();
-    }
-    
-    nextBtn.addEventListener('click', nextSlide);
-    prevBtn.addEventListener('click', prevSlide);
-    
-    indicators.forEach((indicator, index) => {
-      indicator.addEventListener('click', () => {
-        currentSlide = index;
-        updateCarousel();
-      });
+
+    currentSlide = index;
+  }
+
+  // 初始化
+  updateSlide(0);
+
+  // 事件监听
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      let newIndex = currentSlide - 1;
+      if (newIndex < 0) newIndex = totalSlides - 1;
+      updateSlide(newIndex);
     });
-    
-    // 自动轮播
-    setInterval(nextSlide, 5000);
-  });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      let newIndex = currentSlide + 1;
+      if (newIndex >= totalSlides) newIndex = 0;
+      updateSlide(newIndex);
+    });
+  }
 </script>

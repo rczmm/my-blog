@@ -1,5 +1,5 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import AetherLayout from '../layouts/AetherLayout.astro';
 
 // 获取文章统计信息
 const allPosts = await Astro.glob('./posts/*.md');
@@ -13,74 +13,77 @@ const daysDiff = Math.ceil((today.getTime() - startDate.getTime()) / (1000 * 60 
 
 // 技能数据
 const skills = [
-  { name: 'JavaScript', level: 90, color: '#f7df1e' },
-  { name: 'TypeScript', level: 85, color: '#3178c6' },
-  { name: 'React', level: 88, color: '#61dafb' },
-  { name: 'Vue.js', level: 82, color: '#4fc08d' },
-  { name: 'Node.js', level: 80, color: '#339933' },
-  { name: 'CSS/Sass', level: 85, color: '#1572b6' },
-  { name: 'Astro', level: 75, color: '#ff5d01' },
-  { name: 'Git', level: 88, color: '#f05032' }
+  { name: 'JavaScript', level: 90 },
+  { name: 'TypeScript', level: 85 },
+  { name: 'React', level: 88 },
+  { name: 'Vue.js', level: 82 },
+  { name: 'Node.js', level: 80 },
+  { name: 'CSS/Sass', level: 85 },
+  { name: 'Astro', level: 75 },
+  { name: 'Git', level: 88 }
 ];
 
 // 时间线数据
 const timeline = [
   {
     year: '2023',
-    title: '开始技术博客',
-    description: '创建了这个博客，开始分享技术学习心得',
+    title: 'SYSTEM_INIT',
+    description: 'Aether Lab 系统初始化，开始记录技术日志',
     icon: '🚀'
   },
   {
     year: '2022',
-    title: '全栈开发工程师',
-    description: '开始从事全栈开发工作，主要使用 React 和 Node.js',
+    title: 'FULL_STACK_DEV',
+    description: '扩展至后端领域，掌握 React 和 Node.js 核心技术',
     icon: '💼'
   },
   {
     year: '2021',
-    title: '前端进阶',
-    description: '深入学习现代前端框架和工程化工具',
+    title: 'FRONTEND_UPGRADE',
+    description: '深入研究现代前端框架，优化交互体验',
     icon: '📈'
   },
   {
     year: '2020',
-    title: '编程入门',
-    description: '开始学习编程，从 HTML/CSS/JavaScript 开始',
+    title: 'HELLO_WORLD',
+    description: '接触编程世界，开启 HTML/CSS/JS 之旅',
     icon: '🌱'
   }
 ];
 ---
 
-<BaseLayout title="关于我 - 我的博客">
+<AetherLayout title="关于我 - Aether Lab">
   <div class="about-container">
     <!-- 个人介绍卡片 -->
-    <section class="hero-card">
+    <section class="hero-card glass-card">
       <div class="hero-content">
         <div class="avatar-section">
-          <div class="avatar">👨‍💻</div>
+          <div class="avatar-frame">
+            <div class="avatar">👨‍💻</div>
+            <div class="avatar-scan-line"></div>
+          </div>
           <div class="status-indicator">
             <span class="status-dot"></span>
-            <span class="status-text">正在编码中</span>
+            <span class="status-text">STATUS: CODING</span>
           </div>
         </div>
         
         <div class="intro-section">
-          <h1>你好，我是前端开发者！</h1>
+          <h1>IDENTITY_VERIFIED: <span class="highlight">DEVELOPER</span></h1>
           <p class="intro-text">
-            热爱技术的前端工程师，专注于创造优雅的用户体验。
-            喜欢探索新技术，分享学习心得，与技术社区一起成长。
+            &gt; 热爱技术的前端工程师，专注于创造优雅的用户体验。<br/>
+            &gt; 喜欢探索新技术，分享学习心得，与技术社区一起成长。
           </p>
           
           <div class="contact-links">
             <a href="mailto:your.email@example.com" class="contact-link">
-              📧 邮箱
+              [EMAIL]
             </a>
             <a href="https://github.com/yourusername" class="contact-link">
-              🐙 GitHub
+              [GITHUB]
             </a>
             <a href="https://twitter.com/yourusername" class="contact-link">
-              🐦 Twitter
+              [TWITTER]
             </a>
           </div>
         </div>
@@ -88,457 +91,306 @@ const timeline = [
     </section>
 
     <!-- 统计信息 -->
-    <section class="stats-section">
-      <h2>📊 博客统计</h2>
+    <section class="stats-section glass-card">
+      <div class="section-title">SYSTEM_STATS</div>
       <div class="stats-grid">
         <div class="stat-item">
-          <div class="stat-icon">📝</div>
           <div class="stat-value">{totalPosts}</div>
-          <div class="stat-label">篇文章</div>
+          <div class="stat-label">LOGS_COUNT</div>
         </div>
         <div class="stat-item">
-          <div class="stat-icon">🏷️</div>
           <div class="stat-value">{totalTags}</div>
-          <div class="stat-label">个标签</div>
+          <div class="stat-label">TAGS_ACTIVE</div>
         </div>
         <div class="stat-item">
-          <div class="stat-icon">📅</div>
           <div class="stat-value">{daysDiff}</div>
-          <div class="stat-label">天运行</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-icon">👀</div>
-          <div class="stat-value">1.2K</div>
-          <div class="stat-label">次访问</div>
+          <div class="stat-label">DAYS_ONLINE</div>
         </div>
       </div>
     </section>
 
-    <!-- 技能展示 -->
-    <section class="skills-section">
-      <h2>💪 技能栈</h2>
+    <!-- 技能条 -->
+    <section class="skills-section glass-card">
+      <div class="section-title">SKILL_MATRIX</div>
       <div class="skills-grid">
         {skills.map(skill => (
           <div class="skill-item">
-            <div class="skill-header">
+            <div class="skill-info">
               <span class="skill-name">{skill.name}</span>
-              <span class="skill-percentage">{skill.level}%</span>
+              <span class="skill-level">{skill.level}%</span>
             </div>
-            <div class="skill-bar">
-              <div 
-                class="skill-progress" 
-                style={`width: ${skill.level}%; background-color: ${skill.color}`}
-              ></div>
+            <div class="skill-bar-bg">
+              <div class="skill-bar-fill" style={`width: ${skill.level}%`}></div>
             </div>
           </div>
         ))}
       </div>
     </section>
 
-    <!-- 个人时间线 -->
-    <section class="timeline-section">
-      <h2>⏰ 成长时间线</h2>
+    <!-- 时间线 -->
+    <section class="timeline-section glass-card">
+      <div class="section-title">CHRONICLES</div>
       <div class="timeline">
         {timeline.map((item, index) => (
           <div class="timeline-item">
-            <div class="timeline-marker">
-              <span class="timeline-icon">{item.icon}</span>
-            </div>
+            <div class="timeline-marker"></div>
             <div class="timeline-content">
               <div class="timeline-year">{item.year}</div>
               <h3 class="timeline-title">{item.title}</h3>
-              <p class="timeline-description">{item.description}</p>
+              <p class="timeline-desc">{item.description}</p>
             </div>
           </div>
         ))}
       </div>
     </section>
-
-    <!-- 兴趣爱好 -->
-    <section class="interests-section">
-      <h2>🎯 兴趣爱好</h2>
-      <div class="interests-grid">
-        <div class="interest-item">
-          <div class="interest-icon">💻</div>
-          <h3>编程</h3>
-          <p>热爱编程，享受解决问题的过程</p>
-        </div>
-        <div class="interest-item">
-          <div class="interest-icon">📚</div>
-          <h3>阅读</h3>
-          <p>喜欢阅读技术书籍和科幻小说</p>
-        </div>
-        <div class="interest-item">
-          <div class="interest-icon">🎮</div>
-          <h3>游戏</h3>
-          <p>偶尔玩游戏放松，特别是独立游戏</p>
-        </div>
-        <div class="interest-item">
-          <div class="interest-icon">🎵</div>
-          <h3>音乐</h3>
-          <p>听音乐是编程时的最佳伴侣</p>
-        </div>
-      </div>
-    </section>
   </div>
-</BaseLayout>
+</AetherLayout>
 
 <style>
   .about-container {
     max-width: 900px;
     margin: 0 auto;
-    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
   }
 
-  /* 英雄卡片 */
+  /* 个人介绍 */
   .hero-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 20px;
     padding: 3rem;
-    margin-bottom: 3rem;
-    color: white;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   }
 
   .hero-content {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 2rem;
+    display: flex;
     align-items: center;
+    gap: 3rem;
   }
 
-  .avatar-section {
-    text-align: center;
+  .avatar-frame {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 2px solid var(--color-primary-start);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(6, 182, 212, 0.1);
+    overflow: hidden;
   }
 
   .avatar {
     font-size: 5rem;
-    margin-bottom: 1rem;
-    display: block;
+  }
+
+  .avatar-scan-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--color-primary-light);
+    box-shadow: 0 0 10px var(--color-primary-light);
+    animation: scan 2s linear infinite;
   }
 
   .status-indicator {
+    margin-top: 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    font-size: 0.9rem;
-    opacity: 0.9;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-primary-start);
   }
 
   .status-dot {
     width: 8px;
     height: 8px;
-    background: #48bb78;
+    background: var(--color-primary-start);
     border-radius: 50%;
-    animation: pulse 2s infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
+    box-shadow: 0 0 5px var(--color-primary-start);
+    animation: blink 1s step-end infinite;
   }
 
   .intro-section h1 {
-    font-size: 2.5rem;
-    margin: 0 0 1rem 0;
-    font-weight: 700;
+    font-size: 2rem;
+    margin: 0 0 1rem;
+    font-family: var(--font-mono);
+    color: var(--color-text-title);
+  }
+
+  .highlight {
+    color: var(--color-primary-start);
   }
 
   .intro-text {
-    font-size: 1.2rem;
-    line-height: 1.6;
-    margin: 0 0 2rem 0;
-    opacity: 0.9;
+    font-family: var(--font-mono);
+    color: var(--color-text-body);
+    line-height: 1.8;
+    margin-bottom: 2rem;
   }
 
   .contact-links {
     display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
+    gap: 1.5rem;
   }
 
   .contact-link {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border-radius: 25px;
+    font-family: var(--font-mono);
+    color: var(--color-text-code);
     text-decoration: none;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
+    transition: all 0.2s;
   }
 
   .contact-link:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: translateY(-2px);
+    color: var(--color-primary-start);
+    text-shadow: 0 0 5px rgba(6, 182, 212, 0.5);
   }
 
-  /* 统计信息 */
-  .stats-section {
-    margin-bottom: 3rem;
+  /* 统计 */
+  .section-title {
+    font-family: var(--font-mono);
+    font-size: 1.2rem;
+    color: var(--color-neutral);
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.1em;
+    border-bottom: 1px dashed var(--color-neutral-light);
+    padding-bottom: 0.5rem;
   }
 
-  .stats-section h2 {
-    text-align: center;
-    margin-bottom: 2rem;
-    color: #2d3748;
-    font-size: 2rem;
+  .stats-section, .skills-section, .timeline-section {
+    padding: 2rem;
   }
 
   .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-  }
-
-  .stat-item {
-    background: white;
-    padding: 2rem;
-    border-radius: 12px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
     text-align: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-    border: 1px solid #e2e8f0;
-    transition: transform 0.3s ease;
-  }
-
-  .stat-item:hover {
-    transform: translateY(-4px);
-  }
-
-  .stat-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
   }
 
   .stat-value {
     font-size: 2.5rem;
     font-weight: 700;
-    color: #2d3748;
-    margin-bottom: 0.5rem;
+    color: var(--color-primary-start);
+    font-family: var(--font-mono);
   }
 
   .stat-label {
-    color: #718096;
-    font-size: 1rem;
+    font-size: 0.9rem;
+    color: var(--color-neutral);
+    margin-top: 0.5rem;
+    font-family: var(--font-mono);
   }
 
-  /* 技能栈 */
-  .skills-section {
-    background: white;
-    padding: 2rem;
-    border-radius: 12px;
-    margin-bottom: 3rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-    border: 1px solid #e2e8f0;
-  }
-
-  .skills-section h2 {
-    margin: 0 0 2rem 0;
-    color: #2d3748;
-    font-size: 1.8rem;
-  }
-
+  /* 技能 */
   .skills-grid {
     display: grid;
+    grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
   }
 
   .skill-item {
-    background: #f7fafc;
-    padding: 1.5rem;
-    border-radius: 8px;
+    padding: 0.5rem;
   }
 
-  .skill-header {
+  .skill-info {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 0.75rem;
-  }
-
-  .skill-name {
-    font-weight: 600;
-    color: #2d3748;
-  }
-
-  .skill-percentage {
-    color: #718096;
+    margin-bottom: 0.5rem;
+    font-family: var(--font-mono);
     font-size: 0.9rem;
   }
 
-  .skill-bar {
-    height: 8px;
-    background: #e2e8f0;
-    border-radius: 4px;
+  .skill-bar-bg {
+    height: 6px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 3px;
     overflow: hidden;
   }
 
-  .skill-progress {
+  .skill-bar-fill {
     height: 100%;
-    border-radius: 4px;
-    transition: width 1s ease-in-out;
+    background: linear-gradient(90deg, var(--color-primary-start), var(--color-primary-end));
+    border-radius: 3px;
   }
 
   /* 时间线 */
-  .timeline-section {
-    background: white;
-    padding: 2rem;
-    border-radius: 12px;
-    margin-bottom: 3rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-    border: 1px solid #e2e8f0;
-  }
-
-  .timeline-section h2 {
-    margin: 0 0 2rem 0;
-    color: #2d3748;
-    font-size: 1.8rem;
-  }
-
   .timeline {
     position: relative;
-    padding-left: 2rem;
+    padding-left: 1rem;
   }
 
   .timeline::before {
     content: '';
     position: absolute;
-    left: 1rem;
+    left: 0;
     top: 0;
     bottom: 0;
     width: 2px;
-    background: linear-gradient(to bottom, #3182ce, #e2e8f0);
+    background: var(--color-neutral-light);
   }
 
   .timeline-item {
     position: relative;
+    padding-left: 2rem;
     margin-bottom: 2rem;
   }
 
   .timeline-marker {
     position: absolute;
-    left: -2rem;
-    top: 0;
-    width: 3rem;
-    height: 3rem;
-    background: white;
-    border: 3px solid #3182ce;
+    left: -5px;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    background: var(--color-bg-start);
+    border: 2px solid var(--color-primary-start);
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .timeline-icon {
-    font-size: 1.2rem;
-  }
-
-  .timeline-content {
-    padding-left: 1rem;
   }
 
   .timeline-year {
-    color: #3182ce;
-    font-weight: 600;
-    font-size: 1.1rem;
+    font-family: var(--font-mono);
+    color: var(--color-primary-start);
+    font-size: 0.9rem;
+    margin-bottom: 0.2rem;
   }
 
   .timeline-title {
-    margin: 0.5rem 0;
-    color: #2d3748;
-    font-size: 1.3rem;
+    margin: 0 0 0.5rem;
+    font-size: 1.1rem;
+    color: var(--color-text-title);
   }
 
-  .timeline-description {
-    color: #718096;
-    line-height: 1.6;
+  .timeline-desc {
     margin: 0;
+    color: var(--color-text-body);
+    font-size: 0.95rem;
   }
 
-  /* 兴趣爱好 */
-  .interests-section h2 {
-    text-align: center;
-    margin-bottom: 2rem;
-    color: #2d3748;
-    font-size: 2rem;
+  @keyframes scan {
+    0% { top: 0; opacity: 0; }
+    50% { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
   }
 
-  .interests-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
+  @keyframes blink {
+    50% { opacity: 0; }
   }
 
-  .interest-item {
-    background: white;
-    padding: 2rem;
-    border-radius: 12px;
-    text-align: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-    border: 1px solid #e2e8f0;
-    transition: transform 0.3s ease;
-  }
-
-  .interest-item:hover {
-    transform: translateY(-4px);
-  }
-
-  .interest-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-  }
-
-  .interest-item h3 {
-    margin: 0 0 1rem 0;
-    color: #2d3748;
-    font-size: 1.3rem;
-  }
-
-  .interest-item p {
-    color: #718096;
-    line-height: 1.6;
-    margin: 0;
-  }
-
-  /* 响应式设计 */
   @media (max-width: 768px) {
-    .hero-card {
-      padding: 2rem;
-      margin-left: -1rem;
-      margin-right: -1rem;
-      border-radius: 0;
-    }
-
     .hero-content {
-      grid-template-columns: 1fr;
+      flex-direction: column;
       text-align: center;
-      gap: 1.5rem;
     }
-
-    .intro-section h1 {
-      font-size: 2rem;
+    
+    .skills-grid {
+      grid-template-columns: 1fr;
     }
 
     .contact-links {
       justify-content: center;
-    }
-
-    .stats-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    .interests-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .timeline {
-      padding-left: 1.5rem;
-    }
-
-    .timeline-marker {
-      left: -1.5rem;
-      width: 2.5rem;
-      height: 2.5rem;
     }
   }
 </style>

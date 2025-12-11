@@ -61,7 +61,7 @@ const totalContributions = activityData.reduce((sum, [_, count]) => sum + count,
     <div id="activity-chart" class="chart-container"></div>
     
     <div class="calendar-legend">
-      <span>少</span>
+      <span>MIN</span>
       <div class="legend-squares">
         <div class="legend-square level-0"></div>
         <div class="legend-square level-1"></div>
@@ -69,40 +69,176 @@ const totalContributions = activityData.reduce((sum, [_, count]) => sum + count,
         <div class="legend-square level-3"></div>
         <div class="legend-square level-4"></div>
       </div>
-      <span>多</span>
+      <span>MAX</span>
     </div>
   </div>
 </section>
 
+<script>
+  import * as echarts from 'echarts';
 
+  // 接收服务端生成的数据
+  const chartData = JSON.parse(document.getElementById('chart-data-hidden').textContent);
+
+  const initChart = () => {
+    const chartDom = document.getElementById('activity-chart');
+    if (!chartDom) return;
+
+    const myChart = echarts.init(chartDom, null, { renderer: 'canvas' });
+    
+    // 生成过去一年的日期
+    const today = new Date();
+    const range = [
+      new Date(today.getFullYear() - 1, today.getMonth(), today.getDate()).toISOString().split('T')[0],
+      today.toISOString().split('T')[0]
+    ];
+
+    const option = {
+      tooltip: {
+        position: 'top',
+        formatter: function (p: any) {
+          const format = echarts.format.formatTime('yyyy-MM-dd', p.data[0]);
+          return format + ': ' + p.data[1] + ' activities';
+        },
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        borderColor: '#06B6D4',
+        textStyle: {
+          color: '#1E3A8A'
+        }
+      },
+      visualMap: {
+        min: 0,
+        max: 10,
+        calculable: false,
+        orient: 'horizontal',
+        left: 'center',
+        bottom: 0,
+        show: false, // 使用自定义图例
+        inRange: {
+          color: ['#E0F2FE', '#BAE6FD', '#7DD3FC', '#38BDF8', '#0EA5E9']
+        }
+      },
+      calendar: {
+        top: 30,
+        left: 30,
+        right: 30,
+        cellSize: ['auto', 13],
+        range: range,
+        itemStyle: {
+          borderWidth: 2,
+          borderColor: 'transparent', // 透明边框
+          color: 'rgba(255, 255, 255, 0.1)' // 空单元格颜色
+        },
+        yearLabel: { show: false },
+        dayLabel: {
+          firstDay: 1,
+          nameMap: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+          color: '#9CA3AF'
+        },
+        monthLabel: {
+          color: '#9CA3AF'
+        },
+        splitLine: {
+          show: false
+        }
+      },
+      series: {
+        type: 'heatmap',
+        coordinateSystem: 'calendar',
+        data: chartData,
+        itemStyle: {
+          borderRadius: 2
+        }
+      }
+    };
+
+    myChart.setOption(option);
+
+    window.addEventListener('resize', () => {
+      myChart.resize();
+    });
+  };
+
+  // 确保在页面加载后运行
+  document.addEventListener('astro:page-load', initChart);
+  document.addEventListener('DOMContentLoaded', initChart);
+</script>
+
+<script type="application/json" id="chart-data-hidden">
+  {JSON.stringify(activityData)}
+</script>
 
 <style>
   .activity-calendar {
-    background: white;
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-    margin: 2rem 0;
+    /* 背景样式由父容器 glass-card 控制，这里只需处理内部布局 */
+    padding: 0; 
+  }
+
+  .calendar-container {
+    width: 100%;
+  }
+
+  .calendar-header {
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 1px dashed var(--color-neutral-light);
+    padding-bottom: 1rem;
   }
 
   .calendar-header h3 {
-    margin: 0 0 0.5rem 0;
-    color: #2d3748;
+    margin: 0;
+    font-size: 1.2rem;
+    color: var(--color-text-title);
+    font-family: var(--font-mono);
+    letter-spacing: 0.05em;
   }
 
   .calendar-header p {
-    color: #718096;
-    margin: 0 0 1rem 0;
+    color: var(--color-neutral);
+    margin: 0;
     font-size: 0.9rem;
+    font-family: var(--font-mono);
+  }
+  
+  .calendar-header strong {
+    color: var(--color-primary-start);
   }
 
   .chart-container {
     width: 100%;
-    height: 200px;
-    margin-bottom: 1rem;
-    border-radius: 8px;
-    background: #fafafa;
+    height: 180px; /* 调整高度 */
   }
+
+  .calendar-legend {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--color-neutral);
+    margin-top: -10px;
+    font-family: var(--font-mono);
+  }
+
+  .legend-squares {
+    display: flex;
+    gap: 3px;
+  }
+
+  .legend-square {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+  }
+
+  .level-0 { background-color: #E0F2FE; opacity: 0.3; }
+  .level-1 { background-color: #BAE6FD; }
+  .level-2 { background-color: #7DD3FC; }
+  .level-3 { background-color: #38BDF8; }
+  .level-4 { background-color: #0EA5E9; }
+
 
   .calendar-legend {
     display: flex;

@@ -1,5 +1,5 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import AetherLayout from '../layouts/AetherLayout.astro';
 
 // 获取所有博客文章
 const allPosts = await Astro.glob('./posts/*.md');
@@ -16,50 +16,50 @@ const tagCounts = allPosts.reduce((acc, post) => {
 // 按文章数量排序标签
 const sortedTags = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]);
 
-// 为标签分配颜色
-const tagColors = [
-  '#3182ce', '#38a169', '#d69e2e', '#e53e3e', '#805ad5',
-  '#dd6b20', '#319795', '#e56de6', '#4299e1', '#48bb78'
-];
-
-function getTagColor(index: number) {
-  return tagColors[index % tagColors.length];
-}
-
 function formatDate(date: string) {
   return new Date(date).toLocaleDateString('zh-CN', {
     year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
+    month: '2-digit',
+    day: '2-digit'
+  }).replace(/\//g, '-');
 }
 ---
 
-<BaseLayout title="标签 - 我的博客">
+<AetherLayout title="标签 - Aether Lab">
   <div class="tags-container">
     <!-- 页面头部 -->
-    <header class="tags-header">
-      <h1>🏷️ 标签</h1>
-      <p class="tags-stats">
-        共有 <strong>{sortedTags.length}</strong> 个标签，覆盖 <strong>{allPosts.length}</strong> 篇文章
-      </p>
+    <header class="tags-header glass-card">
+      <h1>TAG_INDEX</h1>
+      <div class="tags-stats">
+        <span class="stat-item">
+          <span class="label">TAGS:</span>
+          <span class="value">{sortedTags.length}</span>
+        </span>
+        <span class="divider">|</span>
+        <span class="stat-item">
+          <span class="label">LOGS:</span>
+          <span class="value">{allPosts.length}</span>
+        </span>
+      </div>
     </header>
 
     <!-- 标签云 -->
-    <section class="tag-cloud-section">
-      <h2>📊 标签云</h2>
+    <section class="tag-cloud-section glass-card">
+      <div class="section-title">CLOUD_VISUALIZATION</div>
       <div class="tag-cloud">
         {sortedTags.map(([tag, count], index) => (
           <a 
             href={`#tag-${encodeURIComponent(tag)}`} 
             class="tag-cloud-item"
             style={`
-              font-size: ${Math.max(1, Math.min(2.5, 1 + count * 0.3))}rem;
-              color: ${getTagColor(index)};
+              font-size: ${Math.max(0.8, Math.min(1.5, 0.8 + count * 0.1))}rem;
+              opacity: ${Math.min(1, 0.5 + count * 0.1)};
             `}
           >
+            <span class="bracket">[</span>
             {tag}
-            <span class="tag-count">({count})</span>
+            <span class="tag-count">:{count}</span>
+            <span class="bracket">]</span>
           </a>
         ))}
       </div>
@@ -67,37 +67,286 @@ function formatDate(date: string) {
 
     <!-- 标签详情列表 -->
     <section class="tags-detail">
-      <h2>📑 标签详情</h2>
-      <div class="tags-list">
-        {sortedTags.map(([tag, count], index) => {
-          const tagPosts = allPosts.filter(post => 
-            post.frontmatter.tags?.includes(tag)
-          ).sort((a, b) => 
-            new Date(b.frontmatter.pubDate).valueOf() - new Date(a.frontmatter.pubDate).valueOf()
-          );
-          
-          return (
-            <div class="tag-section" id={`tag-${encodeURIComponent(tag)}`}>
-              <div class="tag-header">
-                <h3 class="tag-title" style={`color: ${getTagColor(index)}`}>
-                  {tag}
-                </h3>
-                <span class="tag-count-badge">{count} 篇文章</span>
-              </div>
-              
-              <div class="tag-posts">
-                {tagPosts.map((post) => (
-                  <article class="tag-post-item">
-                    <div class="post-info">
-                      <h4 class="post-title">
-                        <a href={post.url}>{post.frontmatter.title}</a>
-                      </h4>
-                      <p class="post-description">
-                        {post.frontmatter.description}
-                      </p>
-                      <div class="post-meta">
-                        <time class="post-date">
-                          📅 {formatDate(post.frontmatter.pubDate)}
+      {sortedTags.map(([tag, count], index) => {
+        const tagPosts = allPosts.filter(post => 
+          post.frontmatter.tags?.includes(tag)
+        ).sort((a, b) => 
+          new Date(b.frontmatter.pubDate).valueOf() - new Date(a.frontmatter.pubDate).valueOf()
+        );
+        
+        return (
+          <div class="tag-section glass-card" id={`tag-${encodeURIComponent(tag)}`}>
+            <div class="tag-header">
+              <h3 class="tag-title">
+                <span class="hash">#</span>{tag}
+              </h3>
+              <span class="tag-count-badge">COUNT: {count}</span>
+            </div>
+            
+            <div class="tag-posts">
+              {tagPosts.map((post) => (
+                <article class="tag-post-item">
+                  <a href={post.url} class="item-link-overlay"></a>
+                  <div class="post-status"></div>
+                  <div class="post-info">
+                    <div class="post-meta-top">
+                      <span class="post-id">LOG_{post.url?.split('/').pop()?.slice(0,4).toUpperCase()}</span>
+                      <time class="post-date">{formatDate(post.frontmatter.pubDate)}</time>
+                    </div>
+                    <h4 class="post-title">
+                      {post.frontmatter.title}
+                    </h4>
+                    <p class="post-description">
+                      {post.frontmatter.description}
+                    </p>
+                  </div>
+                  <div class="post-arrow">&gt;</div>
+                </article>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </section>
+  </div>
+</AetherLayout>
+
+<style>
+  .tags-container {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+
+  /* 头部 */
+  .tags-header {
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .tags-header h1 {
+    font-family: var(--font-mono);
+    color: var(--color-text-title);
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    letter-spacing: 0.1em;
+  }
+
+  .tags-stats {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: var(--color-neutral);
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .stat-item .value {
+    color: var(--color-primary-start);
+    font-weight: bold;
+    margin-left: 0.5rem;
+  }
+
+  .divider {
+    color: var(--color-neutral-light);
+  }
+
+  /* 标签云 */
+  .tag-cloud-section {
+    padding: 2rem;
+  }
+
+  .section-title {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: var(--color-neutral);
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.1em;
+    border-bottom: 1px dashed var(--color-neutral-light);
+    padding-bottom: 0.5rem;
+  }
+
+  .tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+  }
+
+  .tag-cloud-item {
+    font-family: var(--font-mono);
+    text-decoration: none;
+    color: var(--color-text-body);
+    transition: all 0.3s;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+  }
+
+  .tag-cloud-item:hover {
+    background: rgba(6, 182, 212, 0.1);
+    color: var(--color-primary-start);
+    transform: scale(1.1);
+  }
+
+  .bracket {
+    color: var(--color-neutral-light);
+  }
+
+  .tag-count {
+    font-size: 0.7em;
+    color: var(--color-neutral);
+  }
+
+  /* 标签详情 */
+  .tags-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .tag-section {
+    padding: 2rem;
+  }
+
+  .tag-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--color-primary-start);
+    padding-bottom: 0.5rem;
+  }
+
+  .tag-title {
+    font-family: var(--font-mono);
+    font-size: 1.5rem;
+    margin: 0;
+    color: var(--color-text-title);
+  }
+
+  .hash {
+    color: var(--color-primary-start);
+    margin-right: 0.2rem;
+  }
+
+  .tag-count-badge {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-neutral);
+    background: rgba(0,0,0,0.05);
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+  }
+
+  .tag-posts {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .tag-post-item {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1rem;
+    border: 1px solid var(--color-neutral-light);
+    border-radius: 8px;
+    transition: all 0.3s;
+    background: rgba(255, 255, 255, 0.3);
+    position: relative;
+  }
+
+  .item-link-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+  }
+
+  .tag-post-item:hover {
+    border-color: var(--color-primary-start);
+    background: rgba(255, 255, 255, 0.6);
+    transform: translateX(5px);
+  }
+
+  .post-status {
+    width: 8px;
+    height: 8px;
+    background: var(--color-neutral-light);
+    border-radius: 50%;
+    transition: background 0.3s;
+  }
+
+  .tag-post-item:hover .post-status {
+    background: var(--color-primary-start);
+    box-shadow: 0 0 5px var(--color-primary-start);
+  }
+
+  .post-info {
+    flex: 1;
+  }
+
+  .post-meta-top {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    color: var(--color-neutral);
+    margin-bottom: 0.3rem;
+  }
+
+  .post-id {
+    color: var(--color-primary-start);
+  }
+
+  .post-title {
+    margin: 0 0 0.5rem;
+    font-size: 1.1rem;
+    color: var(--color-text-title);
+    font-family: var(--font-sans);
+  }
+
+  .post-description {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--color-text-body);
+    line-height: 1.5;
+  }
+
+  .post-arrow {
+    font-family: var(--font-mono);
+    color: var(--color-neutral-light);
+    font-weight: bold;
+    transition: all 0.3s;
+  }
+
+  .tag-post-item:hover .post-arrow {
+    color: var(--color-primary-start);
+    transform: translateX(5px);
+  }
+
+  @media (max-width: 768px) {
+    .tag-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .tag-post-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .post-status, .post-arrow {
+      display: none;
+    }
+  }
+</style>
                         </time>
                         {post.frontmatter.author && (
                           <span class="post-author">

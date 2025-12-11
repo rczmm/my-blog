@@ -1,5 +1,5 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import AetherLayout from '../layouts/AetherLayout.astro';
 import BlogCarousel from '../components/BlogCarousel.astro';
 import ActivityCalendar from '../components/ActivityCalendar.astro';
 
@@ -19,97 +19,107 @@ function formatDate(date: string) {
 }
 ---
 
-<BaseLayout title="我的博客">
+<AetherLayout title="我的博客">
   <!-- 博客轮播图 -->
-  <BlogCarousel posts={allPosts} />
+  <div class="carousel-container glass-card">
+    <BlogCarousel posts={allPosts} />
+  </div>
   
   <!-- 统计信息卡片 -->
   <section class="stats-section">
     <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon">📝</div>
+      <div class="stat-card glass-card">
+        <div class="stat-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        </div>
         <div class="stat-content">
           <h3>{allPosts.length}</h3>
-          <p>篇文章</p>
+          <p>LOGS_COUNT</p>
         </div>
       </div>
       
-      <div class="stat-card">
-        <div class="stat-icon">🏷️</div>
+      <div class="stat-card glass-card">
+        <div class="stat-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+        </div>
         <div class="stat-content">
           <h3>{new Set(allPosts.flatMap(post => post.frontmatter.tags || [])).size}</h3>
-          <p>个标签</p>
+          <p>TAGS_ACTIVE</p>
         </div>
       </div>
       
-      <div class="stat-card">
-        <div class="stat-icon">👀</div>
+      <div class="stat-card glass-card">
+        <div class="stat-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+        </div>
         <div class="stat-content">
           <h3>1.2K</h3>
-          <p>总访问</p>
+          <p>VISITORS</p>
         </div>
       </div>
       
-      <div class="stat-card">
-        <div class="stat-icon">📅</div>
+      <div class="stat-card glass-card">
+        <div class="stat-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        </div>
         <div class="stat-content">
           <h3>{Math.ceil((Date.now() - new Date('2023-01-01').getTime()) / (1000 * 60 * 60 * 24))}</h3>
-          <p>天运行</p>
+          <p>DAYS_ONLINE</p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- 活动热力图 -->
-  <ActivityCalendar posts={allPosts} />
+  <div class="chart-container glass-card">
+    <ActivityCalendar posts={allPosts} />
+  </div>
 
   <!-- 最新文章区域 -->
   <section class="latest-posts">
     <div class="section-header">
-      <h2>📚 最新文章</h2>
-      <a href="/archive" class="more-link">查看全部 →</a>
+      <h2>LATEST_LOGS <span class="blinking-cursor">_</span></h2>
+      <a href="/archive" class="more-link">VIEW_ALL_DATA &rarr;</a>
     </div>
     <div class="posts-grid">
       {allPosts.length === 0 ? (
-        <div class="no-posts">
-          <p>暂无文章，敬请期待...</p>
+        <div class="no-posts glass-card">
+          <p>NO_DATA_FOUND</p>
         </div>
       ) : (
-        allPosts.slice(0, 6).map((post) => (
-          <article class="post-card">
-            <div class="post-card-content">
-              <h3 class="post-title">
-                <a href={post.url}>{post.frontmatter.title}</a>
-              </h3>
-              
-              <p class="post-description">
-                {post.frontmatter.description}
-              </p>
-              
-              <div class="post-meta">
-                <time class="post-date">
-                  📅 {formatDate(post.frontmatter.pubDate)}
-                </time>
-                
-                {post.frontmatter.author && (
-                  <span class="post-author">
-                    👤 {post.frontmatter.author}
-                  </span>
-                )}
-              </div>
-              
-              {post.frontmatter.tags && post.frontmatter.tags.length > 0 && (
-                <div class="post-tags">
-                  {post.frontmatter.tags.slice(0, 3).map((tag: string) => (
-                    <span class="tag">{tag}</span>
-                  ))}
+        allPosts.slice(0, 6).map((post, index) => (
+          <article class="post-card glass-card">
+            <a href={post.url} class="card-link-overlay" aria-label={`Read ${post.frontmatter.title}`}></a>
+            
+            <div class="post-card-layout">
+              <!-- 左侧图标区域 (仿照统计卡片) -->
+              <div class="post-icon-section">
+                <div class="stat-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                 </div>
-              )}
-              
-              <div class="post-footer">
-                <a href={post.url} class="read-more">
-                  阅读全文 →
-                </a>
+                <div class="post-index">LOG_0{index + 1}</div>
+              </div>
+
+              <!-- 右侧内容区域 -->
+              <div class="post-content-section">
+                <h3 class="post-title">
+                  {post.frontmatter.title}
+                </h3>
+                
+                <div class="post-meta-row">
+                  <time class="post-date">{formatDate(post.frontmatter.pubDate)}</time>
+                  {post.frontmatter.author && (
+                    <span class="post-author">@{post.frontmatter.author}</span>
+                  )}
+                </div>
+
+                <p class="post-description">
+                  {post.frontmatter.description}
+                </p>
+                
+                <div class="post-action">
+                  <span class="read-more-text">ACCESS_DATA &gt;&gt;</span>
+                </div>
               </div>
             </div>
           </article>
@@ -117,232 +127,281 @@ function formatDate(date: string) {
       )}
     </div>
   </section>
-</BaseLayout>
+</AetherLayout>
 
 <style>
-  /* 统计卡片样式 */
-  .stats-section {
+  /* 调整轮播图容器 */
+  .carousel-container {
+    padding: 0; /* 移除内边距，让轮播图充满 */
+    margin-bottom: 2rem;
+    overflow: hidden;
+    background: transparent; /* 轮播图自带样式，不需要额外背景 */
+    box-shadow: none; /* 移除阴影 */
+    border: none; /* 移除边框 */
+    backdrop-filter: none;
+  }
+
+  /* 调整图表容器 */
+  .chart-container {
+    padding: 1.5rem;
     margin: 2rem 0;
   }
 
+  /* 统计区域 */
+  .stats-section {
+    margin: 2rem 0;
+  }
+  
   .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1.5rem;
   }
-
+  
   .stat-card {
-    background: white;
     padding: 1.5rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
     display: flex;
     align-items: center;
     gap: 1rem;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 1px solid #e2e8f0;
   }
-
+  
   .stat-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(6, 182, 212, 0.15); /* 青色阴影 */
+    border-color: var(--color-primary-start);
   }
-
+  
   .stat-icon {
-    font-size: 2.5rem;
-    opacity: 0.8;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(6, 182, 212, 0.1);
+    color: var(--color-primary-start);
+    border: 1px solid rgba(6, 182, 212, 0.2);
   }
 
+  .stat-icon svg {
+    width: 24px;
+    height: 24px;
+  }
+  
   .stat-content h3 {
     margin: 0;
-    font-size: 2rem;
-    font-weight: 700;
-    color: #2d3748;
+    font-size: 1.8rem;
+    background: linear-gradient(to right, var(--color-primary-start), var(--color-primary-end));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-family: var(--font-mono);
   }
-
+  
   .stat-content p {
     margin: 0;
-    color: #718096;
-    font-size: 0.9rem;
+    color: var(--color-neutral);
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    font-family: var(--font-mono);
   }
 
-  /* 区域头部 */
+  /* 最新文章 */
+  .latest-posts {
+    margin: 4rem 0;
+  }
+  
   .section-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-end;
     margin-bottom: 2rem;
+    border-bottom: 1px solid var(--color-neutral-light);
+    padding-bottom: 0.5rem;
   }
-
+  
   .section-header h2 {
+    font-size: 1.5rem;
     margin: 0;
-    color: #2d3748;
-    font-size: 1.8rem;
+    font-family: var(--font-mono);
+    color: var(--color-text-title);
+    letter-spacing: 0.05em;
   }
 
+  .blinking-cursor {
+    color: var(--color-primary-start);
+    animation: blink 1s step-end infinite;
+  }
+  
   .more-link {
-    color: #3182ce;
-    font-weight: 600;
+    color: var(--color-primary-start);
+    font-weight: 500;
+    transition: all 0.2s;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
     text-decoration: none;
-    transition: color 0.2s ease;
   }
-
+  
   .more-link:hover {
-    color: #2c5aa0;
+    color: var(--color-primary-end);
+    text-shadow: 0 0 5px rgba(6, 182, 212, 0.5);
   }
-
-  /* 文章网格样式 */
-  .latest-posts {
-    margin: 3rem 0;
-  }
-
+  
   .posts-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 2rem;
   }
-
-  .post-card {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-    transition: all 0.3s ease;
-    overflow: hidden;
-    border: 1px solid #e2e8f0;
-  }
-
-  .post-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-  }
-
-  .post-card-content {
-    padding: 1.5rem;
-  }
-
-  .post-title {
-    margin: 0 0 1rem 0;
-    font-size: 1.3rem;
-    line-height: 1.3;
-  }
-
-  .post-title a {
-    color: #2d3748;
-    text-decoration: none;
-    font-weight: 600;
-    transition: color 0.2s ease;
-  }
-
-  .post-title a:hover {
-    color: #3182ce;
-  }
-
-  .post-description {
-    color: #718096;
-    line-height: 1.6;
-    margin: 0 0 1.5rem 0;
-    font-size: 0.95rem;
-  }
-
-  .post-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    font-size: 0.875rem;
-    color: #a0aec0;
-  }
-
-  .post-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .tag {
-    background: #edf2f7;
-    color: #4a5568;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    transition: all 0.2s ease;
-  }
-
-  .tag:hover {
-    background: #e2e8f0;
-    transform: scale(1.05);
-  }
-
-  .post-footer {
-    border-top: 1px solid #e2e8f0;
-    padding-top: 1rem;
-    margin-top: 1rem;
-  }
-
-  .read-more {
-    color: #3182ce;
-    font-weight: 600;
-    text-decoration: none;
-    font-size: 0.9rem;
-    transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-  }
-
-  .read-more:hover {
-    color: #2c5aa0;
-    transform: translateX(2px);
-  }
-
+  
   .no-posts {
     grid-column: 1 / -1;
     text-align: center;
     padding: 3rem;
-    color: #a0aec0;
-    font-size: 1.1rem;
-    background: white;
-    border-radius: 12px;
-    border: 2px dashed #e2e8f0;
+    color: var(--color-neutral);
+    font-family: var(--font-mono);
+  }
+  
+  .post-card {
+    height: 100%;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  .card-link-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    cursor: pointer;
+  }
+  
+  /* 移除之前的左侧渐变条 */
+  
+  /* 移除之前的角落装饰 */
+
+  .post-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(6, 182, 212, 0.15); /* 与统计卡片一致的青色阴影 */
+    border-color: var(--color-primary-start);
   }
 
-  /* 响应式设计 */
+  /* 悬停时让图标也发光 */
+  .post-card:hover .stat-icon {
+    background: rgba(6, 182, 212, 0.2);
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+  }
+  
+  .post-card-layout {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    height: 100%;
+    align-items: flex-start;
+  }
+
+  .post-icon-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .post-index {
+    font-size: 0.7rem;
+    color: var(--color-neutral);
+    font-family: var(--font-mono);
+    letter-spacing: 0.05em;
+  }
+
+  .post-content-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-width: 0; /* 防止内容溢出 */
+  }
+
+  .post-title {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.2rem;
+    line-height: 1.3;
+    font-family: var(--font-sans);
+    color: var(--color-text-title);
+    transition: color 0.2s;
+    background: linear-gradient(to right, var(--color-text-title) 50%, var(--color-primary-start) 50%);
+    background-size: 200% 100%;
+    background-position: 0 0;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .post-card:hover .post-title {
+    background-position: -100% 0;
+  }
+  
+  .post-meta-row {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.75rem;
+    color: var(--color-neutral);
+    font-family: var(--font-mono);
+    margin-bottom: 1rem;
+  }
+
+  .post-description {
+    color: var(--color-text-body);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    flex-grow: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.5;
+  }
+  
+  .post-action {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: auto;
+  }
+
+  .read-more-text {
+    font-size: 0.8rem;
+    font-family: var(--font-mono);
+    color: var(--color-primary-start);
+    opacity: 0.7;
+    transition: all 0.3s ease;
+    transform: translateX(0);
+  }
+
+  .post-card:hover .read-more-text {
+    opacity: 1;
+    transform: translateX(5px);
+    text-shadow: 0 0 8px rgba(6, 182, 212, 0.4);
+  }
+
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+
+  /* 响应式调整 */
   @media (max-width: 768px) {
-    .stats-grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1rem;
-    }
-
-    .stat-card {
-      padding: 1rem;
-    }
-
-    .stat-icon {
-      font-size: 2rem;
-    }
-
-    .stat-content h3 {
-      font-size: 1.5rem;
-    }
-
     .section-header {
       flex-direction: column;
       align-items: flex-start;
-      gap: 1rem;
+      gap: 0.5rem;
     }
-
-    .posts-grid {
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-    }
-
-    .post-card-content {
-      padding: 1.25rem;
+    
+    .stats-grid {
+      grid-template-columns: 1fr 1fr;
     }
   }
-
+  
   @media (max-width: 480px) {
     .stats-grid {
       grid-template-columns: 1fr;
