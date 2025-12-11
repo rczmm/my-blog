@@ -1,0 +1,520 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// 获取所有博客文章
+const allPosts = await Astro.glob('./posts/*.md');
+
+// 为搜索准备数据
+const searchData = allPosts.map(post => ({
+  title: post.frontmatter.title,
+  description: post.frontmatter.description,
+  url: post.url,
+  pubDate: post.frontmatter.pubDate,
+  author: post.frontmatter.author,
+  tags: post.frontmatter.tags || []
+}));
+---
+
+<BaseLayout title="搜索 - 我的博客">
+  <div class="search-container">
+    <!-- 搜索头部 -->
+    <header class="search-header">
+      <h1>🔍 搜索文章</h1>
+      <p class="search-subtitle">
+        在 <strong>{allPosts.length}</strong> 篇文章中快速找到您需要的内容
+      </p>
+    </header>
+
+    <!-- 搜索框 -->
+    <div class="search-box-container">
+      <div class="search-box">
+        <input 
+          type="text" 
+          id="searchInput" 
+          placeholder="输入关键词搜索文章..." 
+          class="search-input"
+          autocomplete="off"
+        >
+        <button class="search-btn" id="searchBtn">
+          🔍
+        </button>
+      </div>
+      
+      <!-- 搜索建议 -->
+      <div class="search-suggestions" id="searchSuggestions">
+        <div class="suggestion-category">
+          <h3>🔥 热门标签</h3>
+          <div class="tag-suggestions">
+            <button class="suggestion-tag" data-tag="Astro">Astro</button>
+            <button class="suggestion-tag" data-tag="前端">前端</button>
+            <button class="suggestion-tag" data-tag="性能优化">性能优化</button>
+            <button class="suggestion-tag" data-tag="Markdown">Markdown</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 搜索结果 -->
+    <div class="search-results" id="searchResults">
+      <!-- 默认显示所有文章 -->
+      <div class="results-header">
+        <h2>📚 所有文章</h2>
+        <span class="results-count" id="resultsCount">{allPosts.length} 篇文章</span>
+      </div>
+      
+      <div class="results-grid" id="resultsGrid">
+        {allPosts.map((post) => (
+          <article class="result-card">
+            <div class="result-content">
+              <h3 class="result-title">
+                <a href={post.url}>{post.frontmatter.title}</a>
+              </h3>
+              
+              <p class="result-description">
+                {post.frontmatter.description}
+              </p>
+              
+              <div class="result-meta">
+                <time class="result-date">
+                  📅 {new Date(post.frontmatter.pubDate).toLocaleDateString('zh-CN')}
+                </time>
+                
+                {post.frontmatter.author && (
+                  <span class="result-author">
+                    👤 {post.frontmatter.author}
+                  </span>
+                )}
+              </div>
+              
+              {post.frontmatter.tags && post.frontmatter.tags.length > 0 && (
+                <div class="result-tags">
+                  {post.frontmatter.tags.slice(0, 3).map((tag: string) => (
+                    <span class="result-tag">{tag}</span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+
+    <!-- 无结果状态 -->
+    <div class="no-results" id="noResults" style="display: none;">
+      <div class="no-results-icon">🔍</div>
+      <h2>未找到相关文章</h2>
+      <p>尝试使用不同的关键词或浏览所有文章</p>
+      <button class="clear-search-btn" id="clearSearch">
+        清除搜索
+      </button>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .search-container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .search-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    color: white;
+  }
+
+  .search-header h1 {
+    margin: 0 0 1rem 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+  }
+
+  .search-subtitle {
+    margin: 0;
+    font-size: 1.1rem;
+    opacity: 0.9;
+  }
+
+  .search-subtitle strong {
+    font-weight: 600;
+  }
+
+  /* 搜索框样式 */
+  .search-box-container {
+    margin-bottom: 3rem;
+  }
+
+  .search-box {
+    display: flex;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    border: 2px solid #e2e8f0;
+    transition: all 0.3s ease;
+  }
+
+  .search-box:focus-within {
+    border-color: #3182ce;
+    box-shadow: 0 8px 24px rgba(49, 130, 206, 0.2);
+  }
+
+  .search-input {
+    flex: 1;
+    padding: 1rem 1.5rem;
+    border: none;
+    font-size: 1.1rem;
+    outline: none;
+    background: transparent;
+  }
+
+  .search-input::placeholder {
+    color: #a0aec0;
+  }
+
+  .search-btn {
+    background: #3182ce;
+    border: none;
+    color: white;
+    padding: 1rem 1.5rem;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  .search-btn:hover {
+    background: #2c5aa0;
+  }
+
+  /* 搜索建议 */
+  .search-suggestions {
+    margin-top: 2rem;
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    border: 1px solid #e2e8f0;
+  }
+
+  .suggestion-category h3 {
+    margin: 0 0 1rem 0;
+    color: #2d3748;
+    font-size: 1.1rem;
+  }
+
+  .tag-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .suggestion-tag {
+    background: #edf2f7;
+    color: #4a5568;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .suggestion-tag:hover {
+    background: #e2e8f0;
+    transform: translateY(-2px);
+  }
+
+  /* 搜索结果 */
+  .results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e2e8f0;
+  }
+
+  .results-header h2 {
+    margin: 0;
+    color: #2d3748;
+    font-size: 1.8rem;
+  }
+
+  .results-count {
+    color: #718096;
+    font-size: 1rem;
+    font-weight: 500;
+  }
+
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+  }
+
+  .result-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+  }
+
+  .result-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  .result-content {
+    padding: 1.5rem;
+  }
+
+  .result-title {
+    margin: 0 0 1rem 0;
+    font-size: 1.3rem;
+    line-height: 1.3;
+  }
+
+  .result-title a {
+    color: #2d3748;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .result-title a:hover {
+    color: #3182ce;
+  }
+
+  .result-description {
+    color: #718096;
+    line-height: 1.6;
+    margin: 0 0 1rem 0;
+  }
+
+  .result-meta {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    color: #a0aec0;
+    flex-wrap: wrap;
+  }
+
+  .result-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .result-tag {
+    background: #edf2f7;
+    color: #4a5568;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+
+  /* 高亮搜索结果 */
+  .highlight {
+    background: #fed7d7;
+    color: #c53030;
+    padding: 0.1rem 0.2rem;
+    border-radius: 3px;
+    font-weight: 600;
+  }
+
+  /* 无结果状态 */
+  .no-results {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #718096;
+  }
+
+  .no-results-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.6;
+  }
+
+  .no-results h2 {
+    margin: 0 0 1rem 0;
+    color: #2d3748;
+  }
+
+  .no-results p {
+    margin: 0 0 2rem 0;
+    font-size: 1.1rem;
+  }
+
+  .clear-search-btn {
+    background: #3182ce;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  .clear-search-btn:hover {
+    background: #2c5aa0;
+  }
+
+  /* 响应式设计 */
+  @media (max-width: 768px) {
+    .search-header {
+      padding: 1.5rem;
+      margin-left: -1rem;
+      margin-right: -1rem;
+      border-radius: 0;
+    }
+
+    .search-header h1 {
+      font-size: 2rem;
+    }
+
+    .results-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .results-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .search-input {
+      font-size: 1rem;
+    }
+  }
+</style>
+
+<script define:vars={{ searchData }}>
+  document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
+    const resultsGrid = document.getElementById('resultsGrid');
+    const resultsCount = document.getElementById('resultsCount');
+    const noResults = document.getElementById('noResults');
+    const searchResults = document.getElementById('searchResults');
+    const clearSearchBtn = document.getElementById('clearSearch');
+    const suggestionTags = document.querySelectorAll('.suggestion-tag');
+
+    let currentResults = searchData;
+
+    function highlightText(text, query) {
+      if (!query) return text;
+      const regex = new RegExp(`(${query})`, 'gi');
+      return text.replace(regex, '<span class="highlight">$1</span>');
+    }
+
+    function renderResults(results, query = '') {
+      if (results.length === 0) {
+        searchResults.style.display = 'none';
+        noResults.style.display = 'block';
+        return;
+      }
+
+      searchResults.style.display = 'block';
+      noResults.style.display = 'none';
+      
+      resultsCount.textContent = `${results.length} 篇文章`;
+      
+      resultsGrid.innerHTML = results.map(post => `
+        <article class="result-card">
+          <div class="result-content">
+            <h3 class="result-title">
+              <a href="${post.url}">${highlightText(post.title, query)}</a>
+            </h3>
+            
+            <p class="result-description">
+              ${highlightText(post.description, query)}
+            </p>
+            
+            <div class="result-meta">
+              <time class="result-date">
+                📅 ${new Date(post.pubDate).toLocaleDateString('zh-CN')}
+              </time>
+              ${post.author ? `
+                <span class="result-author">
+                  👤 ${post.author}
+                </span>
+              ` : ''}
+            </div>
+            
+            ${post.tags.length > 0 ? `
+              <div class="result-tags">
+                ${post.tags.slice(0, 3).map(tag => 
+                  `<span class="result-tag">${highlightText(tag, query)}</span>`
+                ).join('')}
+              </div>
+            ` : ''}
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function performSearch(query) {
+      if (!query.trim()) {
+        currentResults = searchData;
+        renderResults(currentResults);
+        return;
+      }
+
+      const searchTerms = query.toLowerCase().split(' ').filter(term => term.length > 0);
+      
+      currentResults = searchData.filter(post => {
+        const searchableText = [
+          post.title,
+          post.description,
+          post.author || '',
+          ...(post.tags || [])
+        ].join(' ').toLowerCase();
+
+        return searchTerms.every(term => searchableText.includes(term));
+      });
+
+      renderResults(currentResults, query);
+    }
+
+    // 搜索事件
+    searchInput.addEventListener('input', (e) => {
+      performSearch(e.target.value);
+    });
+
+    searchBtn.addEventListener('click', () => {
+      performSearch(searchInput.value);
+    });
+
+    // 回车键搜索
+    searchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        performSearch(searchInput.value);
+      }
+    });
+
+    // 清除搜索
+    clearSearchBtn.addEventListener('click', () => {
+      searchInput.value = '';
+      performSearch('');
+    });
+
+    // 标签建议点击
+    suggestionTags.forEach(tag => {
+      tag.addEventListener('click', () => {
+        const tagName = tag.getAttribute('data-tag');
+        searchInput.value = tagName;
+        performSearch(tagName);
+      });
+    });
+
+    // 初始渲染
+    renderResults(searchData);
+  });
+</script>

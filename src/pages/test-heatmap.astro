@@ -1,0 +1,102 @@
+---
+import ActivityCalendar from '../components/ActivityCalendar.astro';
+
+// 创建一些测试文章数据
+const testPosts = [
+  {
+    frontmatter: {
+      title: 'ECharts测试文章1',
+      pubDate: '2024-01-15',
+      description: '测试ECharts热力图显示'
+    }
+  },
+  {
+    frontmatter: {
+      title: 'ECharts测试文章2', 
+      pubDate: '2024-02-20',
+      description: '测试ECharts热力图显示'
+    }
+  },
+  {
+    frontmatter: {
+      title: 'ECharts测试文章3',
+      pubDate: '2024-03-10', 
+      description: '测试ECharts热力图显示'
+    }
+  },
+  {
+    frontmatter: {
+      title: 'ECharts测试文章4',
+      pubDate: '2023-12-25', 
+      description: '测试ECharts热力图显示'
+    }
+  },
+  {
+    frontmatter: {
+      title: 'ECharts测试文章5',
+      pubDate: '2023-11-15', 
+      description: '测试ECharts热力图显示'
+    }
+  }
+];
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ECharts热力图测试</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: #f7fafc;
+    }
+    .test-info {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .highlight {
+      background: #e6fffa;
+      padding: 1rem;
+      border-left: 4px solid #38b2ac;
+      margin: 1rem 0;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎯 ECharts热力图测试页面</h1>
+  <div class="highlight">
+    <p><strong>✨ 现在使用专业的ECharts库来显示活动热力图！</strong></p>
+    <p>ECharts提供了更稳定、更美观、更专业的热力图显示效果。</p>
+  </div>
+  
+  <ActivityCalendar posts={testPosts} />
+  
+  <div class="test-info">
+    <h3>📊 测试数据信息：</h3>
+    <ul>
+      {testPosts.map(post => (
+        <li><strong>{post.frontmatter.title}</strong> - {post.frontmatter.pubDate}</li>
+      ))}
+    </ul>
+    <p><strong>总数据项：</strong>{testPosts.length} 篇文章</p>
+    <p><strong>ECharts特性：</strong></p>
+    <ul>
+      <li>✅ 专业的日历热力图显示</li>
+      <li>✅ 自动适配年度日期范围</li>
+      <li>✅ 智能的颜色分级显示</li>
+      <li>✅ 交互式悬停提示</li>
+      <li>✅ 完全响应式设计</li>
+    </ul>
+    <p><strong>提示：</strong>请打开浏览器控制台查看详细的加载日志。</p>
+  </div>
+</body>
+</html>

@@ -1,0 +1,33 @@
+---
+// 在这个文件的 --- 之间可以写 JavaScript/TypeScript 代码
+// `Astro.props` 可以获取从 Markdown frontmatter 传递过来的数据
+const { frontmatter } = Astro.props;
+---
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{frontmatter.title}</title>
+    <style>
+        /* 在这里写一些基本的 CSS 样式 */
+        body { font-family: sans-serif; line-height: 1.6; }
+        .container { max-width: 720px; margin: 0 auto; padding: 2rem; }
+        h1 { margin-bottom: 0.5rem; }
+        .meta { color: #666; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>{frontmatter.title}</h1>
+            <p class="meta">
+                作者：{frontmatter.author} | 发布于：{new Date(frontmatter.pubDate).toLocaleDateString()}
+            </p>
+        </header>
+        <main>
+            <!-- <slot /> 是一个占位符，Markdown 的正文内容会被渲染到这里 -->
+            <slot />
+        </main>
+    </div>
+</body>
+</html>

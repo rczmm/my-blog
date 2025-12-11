@@ -1,0 +1,292 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// 获取所有博客文章
+const allPosts = await Astro.glob('./posts/*.md');
+
+// 按发布日期降序排序
+allPosts.sort((a, b) => new Date(b.frontmatter.pubDate).valueOf() - new Date(a.frontmatter.pubDate).valueOf());
+
+// 按年份分组
+const postsByYear = allPosts.reduce((acc, post) => {
+  const year = new Date(post.frontmatter.pubDate).getFullYear();
+  if (!acc[year]) {
+    acc[year] = [];
+  }
+  acc[year].push(post);
+  return acc;
+}, {} as Record<number, any[]>);
+
+const years = Object.keys(postsByYear).map(Number).sort((a, b) => b - a);
+
+function formatDate(date: string) {
+  return new Date(date).toLocaleDateString('zh-CN', {
+    month: 'long',
+    day: 'numeric'
+  });
+}
+---
+
+<BaseLayout title="文章归档 - 我的博客">
+  <div class="archive-container">
+    <!-- 页面头部 -->
+    <header class="archive-header">
+      <h1>📚 文章归档</h1>
+      <p class="archive-stats">
+        共有 <strong>{allPosts.length}</strong> 篇文章，跨越 <strong>{years.length}</strong> 年时光
+      </p>
+    </header>
+
+    <!-- 归档内容 -->
+    <div class="archive-content">
+      {years.map(year => (
+        <section class="year-section">
+          <h2 class="year-title">
+            <span class="year-number">{year}</span>
+            <span class="year-count">({postsByYear[year].length} 篇)</span>
+          </h2>
+          
+          <div class="posts-timeline">
+            {postsByYear[year].map((post, index) => (
+              <article class="timeline-item">
+                <div class="timeline-marker"></div>
+                <div class="timeline-content">
+                  <time class="post-date">
+                    {formatDate(post.frontmatter.pubDate)}
+                  </time>
+                  <h3 class="post-title">
+                    <a href={post.url}>{post.frontmatter.title}</a>
+                  </h3>
+                  <p class="post-description">
+                    {post.frontmatter.description}
+                  </p>
+                  {post.frontmatter.tags && (
+                    <div class="post-tags">
+                      {post.frontmatter.tags.slice(0, 3).map((tag: string) => (
+                        <span class="tag">{tag}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+
+    {allPosts.length === 0 && (
+      <div class="empty-state">
+        <div class="empty-icon">📝</div>
+        <h2>暂无文章</h2>
+        <p>还没有发布任何文章，敬请期待！</p>
+      </div>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .archive-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .archive-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    color: white;
+  }
+
+  .archive-header h1 {
+    margin: 0 0 1rem 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+  }
+
+  .archive-stats {
+    margin: 0;
+    font-size: 1.1rem;
+    opacity: 0.9;
+  }
+
+  .archive-stats strong {
+    font-weight: 600;
+  }
+
+  .year-section {
+    margin-bottom: 3rem;
+  }
+
+  .year-title {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin: 0 0 2rem 0;
+    padding-bottom: 1rem;
+    border-bottom: 3px solid #e2e8f0;
+  }
+
+  .year-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2d3748;
+  }
+
+  .year-count {
+    font-size: 1rem;
+    color: #718096;
+    font-weight: 500;
+  }
+
+  .posts-timeline {
+    position: relative;
+    padding-left: 2rem;
+  }
+
+  .posts-timeline::before {
+    content: '';
+    position: absolute;
+    left: 0.75rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, #3182ce, #e2e8f0);
+  }
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: 2rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    transition: all 0.3s ease;
+    border: 1px solid #e2e8f0;
+  }
+
+  .timeline-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  }
+
+  .timeline-marker {
+    position: absolute;
+    left: -2.25rem;
+    top: 1.5rem;
+    width: 12px;
+    height: 12px;
+    background: #3182ce;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 0 0 2px #3182ce;
+  }
+
+  .timeline-content {
+    padding: 1.5rem;
+  }
+
+  .post-date {
+    display: inline-block;
+    color: #3182ce;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .post-title {
+    margin: 0 0 0.75rem 0;
+    font-size: 1.4rem;
+    line-height: 1.3;
+  }
+
+  .post-title a {
+    color: #2d3748;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .post-title a:hover {
+    color: #3182ce;
+  }
+
+  .post-description {
+    color: #718096;
+    line-height: 1.6;
+    margin: 0 0 1rem 0;
+  }
+
+  .post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .tag {
+    background: #edf2f7;
+    color: #4a5568;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .tag:hover {
+    background: #e2e8f0;
+    transform: scale(1.05);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #718096;
+  }
+
+  .empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+  }
+
+  .empty-state h2 {
+    margin: 0 0 1rem 0;
+    color: #2d3748;
+  }
+
+  .empty-state p {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+
+  @media (max-width: 768px) {
+    .archive-header {
+      padding: 1.5rem;
+      margin-left: -1rem;
+      margin-right: -1rem;
+      border-radius: 0;
+    }
+
+    .archive-header h1 {
+      font-size: 2rem;
+    }
+
+    .posts-timeline {
+      padding-left: 1.5rem;
+    }
+
+    .timeline-marker {
+      left: -1.75rem;
+    }
+
+    .timeline-content {
+      padding: 1.25rem;
+    }
+
+    .year-title {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+  }
+</style>

@@ -1,0 +1,462 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="联系我 - 我的博客">
+  <div class="contact-container">
+    <!-- 页面头部 -->
+    <header class="contact-header">
+      <h1>📮 联系我</h1>
+      <p class="contact-subtitle">
+        很高兴与您交流！无论是技术讨论、项目合作还是其他任何话题，都欢迎联系我。
+      </p>
+    </header>
+
+    <div class="contact-content">
+      <!-- 联系方式卡片 -->
+      <section class="contact-methods">
+        <h2>📞 联系方式</h2>
+        <div class="methods-grid">
+          <a href="mailto:your.email@example.com" class="contact-card email">
+            <div class="card-icon">📧</div>
+            <div class="card-content">
+              <h3>邮箱</h3>
+              <p>your.email@example.com</p>
+              <span class="card-action">发送邮件</span>
+            </div>
+          </a>
+
+          <a href="https://github.com/yourusername" class="contact-card github" target="_blank">
+            <div class="card-icon">🐙</div>
+            <div class="card-content">
+              <h3>GitHub</h3>
+              <p>@yourusername</p>
+              <span class="card-action">访问主页</span>
+            </div>
+          </a>
+
+          <a href="https://twitter.com/yourusername" class="contact-card twitter" target="_blank">
+            <div class="card-icon">🐦</div>
+            <div class="card-content">
+              <h3>Twitter</h3>
+              <p>@yourusername</p>
+              <span class="card-action">关注我</span>
+            </div>
+          </a>
+
+          <a href="https://www.linkedin.com/in/yourusername" class="contact-card linkedin" target="_blank">
+            <div class="card-icon">💼</div>
+            <div class="card-content">
+              <h3>LinkedIn</h3>
+              <p>专业档案</p>
+              <span class="card-action">查看资料</span>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <!-- 留言表单 -->
+      <section class="message-form">
+        <h2>💬 发送消息</h2>
+        <form class="contact-form" id="contactForm">
+          <div class="form-group">
+            <label for="name">姓名 *</label>
+            <input type="text" id="name" name="name" required>
+          </div>
+
+          <div class="form-group">
+            <label for="email">邮箱 *</label>
+            <input type="email" id="email" name="email" required>
+          </div>
+
+          <div class="form-group">
+            <label for="subject">主题 *</label>
+            <input type="text" id="subject" name="subject" required>
+          </div>
+
+          <div class="form-group">
+            <label for="message">消息内容 *</label>
+            <textarea id="message" name="message" rows="6" required></textarea>
+          </div>
+
+          <button type="submit" class="submit-btn">
+            <span class="btn-text">发送消息</span>
+            <span class="btn-icon">📤</span>
+          </button>
+        </form>
+      </section>
+
+      <!-- FAQ 部分 -->
+      <section class="faq-section">
+        <h2>❓ 常见问题</h2>
+        <div class="faq-list">
+          <details class="faq-item">
+            <summary>你多久回复一次邮件？</summary>
+            <div class="faq-content">
+              <p>我通常在24-48小时内回复邮件。如果是紧急事务，请在邮件标题中注明"紧急"。</p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary>可以请你做项目咨询吗？</summary>
+            <div class="faq-content">
+              <p>当然可以！我很乐意讨论技术项目和提供建议。请详细描述您的项目需求。</p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary>你接受客座博客写作吗？</summary>
+            <div class="faq-content">
+              <p>我很乐意为高质量的技术博客撰写客座文章。请通过邮件联系我讨论具体细节。</p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary>如何订阅你的博客更新？</summary>
+            <div class="faq-content">
+              <p>目前可以通过关注我的社交媒体账号来获取更新通知。RSS 功能正在开发中。</p>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <!-- 位置信息 -->
+      <section class="location-section">
+        <h2>📍 位置信息</h2>
+        <div class="location-card">
+          <div class="location-info">
+            <div class="location-item">
+              <span class="location-icon">🌍</span>
+              <div>
+                <h3>当前位置</h3>
+                <p>中国·北京</p>
+              </div>
+            </div>
+            <div class="location-item">
+              <span class="location-icon">⏰</span>
+              <div>
+                <h3>时区</h3>
+                <p>UTC+8 (北京时间)</p>
+              </div>
+            </div>
+            <div class="location-item">
+              <span class="location-icon">🌐</span>
+              <div>
+                <h3>语言</h3>
+                <p>中文、English</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .contact-container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .contact-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    color: white;
+  }
+
+  .contact-header h1 {
+    margin: 0 0 1rem 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+  }
+
+  .contact-subtitle {
+    margin: 0;
+    font-size: 1.1rem;
+    opacity: 0.9;
+    line-height: 1.6;
+  }
+
+  .contact-content {
+    display: grid;
+    gap: 3rem;
+  }
+
+  /* 联系方式卡片 */
+  .contact-methods h2 {
+    margin: 0 0 2rem 0;
+    color: #2d3748;
+    font-size: 1.8rem;
+  }
+
+  .methods-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .contact-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .contact-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  .card-icon {
+    font-size: 3rem;
+    opacity: 0.8;
+  }
+
+  .card-content h3 {
+    margin: 0 0 0.5rem 0;
+    color: #2d3748;
+    font-size: 1.2rem;
+  }
+
+  .card-content p {
+    margin: 0 0 0.5rem 0;
+    color: #718096;
+  }
+
+  .card-action {
+    color: #3182ce;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  /* 表单样式 */
+  .message-form {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    border: 1px solid #e2e8f0;
+  }
+
+  .message-form h2 {
+    margin: 0 0 2rem 0;
+    color: #2d3748;
+    font-size: 1.8rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #2d3748;
+    font-weight: 600;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.2s ease;
+    font-family: inherit;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: #3182ce;
+    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+  }
+
+  .submit-btn {
+    background: linear-gradient(135deg, #3182ce 0%, #2c5aa0 100%);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(49, 130, 206, 0.3);
+  }
+
+  /* FAQ 样式 */
+  .faq-section {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    border: 1px solid #e2e8f0;
+  }
+
+  .faq-section h2 {
+    margin: 0 0 2rem 0;
+    color: #2d3748;
+    font-size: 1.8rem;
+  }
+
+  .faq-item {
+    border-bottom: 1px solid #e2e8f0;
+    padding: 1rem 0;
+  }
+
+  .faq-item:last-child {
+    border-bottom: none;
+  }
+
+  .faq-item summary {
+    font-weight: 600;
+    color: #2d3748;
+    cursor: pointer;
+    padding: 0.5rem 0;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .faq-item summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-item summary::after {
+    content: '+';
+    font-size: 1.2rem;
+    color: #3182ce;
+    transition: transform 0.3s ease;
+  }
+
+  .faq-item[open] summary::after {
+    transform: rotate(45deg);
+  }
+
+  .faq-content {
+    padding: 1rem 0 0.5rem 0;
+  }
+
+  .faq-content p {
+    margin: 0;
+    color: #718096;
+    line-height: 1.6;
+  }
+
+  /* 位置信息 */
+  .location-section h2 {
+    margin: 0 0 2rem 0;
+    color: #2d3748;
+    font-size: 1.8rem;
+  }
+
+  .location-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    border: 1px solid #e2e8f0;
+  }
+
+  .location-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+  }
+
+  .location-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .location-icon {
+    font-size: 2rem;
+    opacity: 0.8;
+  }
+
+  .location-item h3 {
+    margin: 0 0 0.25rem 0;
+    color: #2d3748;
+    font-size: 1.1rem;
+  }
+
+  .location-item p {
+    margin: 0;
+    color: #718096;
+  }
+
+  /* 响应式设计 */
+  @media (max-width: 768px) {
+    .contact-header {
+      padding: 1.5rem;
+      margin-left: -1rem;
+      margin-right: -1rem;
+      border-radius: 0;
+    }
+
+    .contact-header h1 {
+      font-size: 2rem;
+    }
+
+    .methods-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .contact-card {
+      flex-direction: column;
+      text-align: center;
+      gap: 1rem;
+    }
+
+    .location-info {
+      grid-template-columns: 1fr;
+    }
+
+    .location-item {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('contactForm');
+    
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // 这里可以添加表单提交逻辑
+        // 例如发送到后端API或第三方服务
+        
+        alert('谢谢您的消息！我会尽快回复您。');
+        form.reset();
+      });
+    }
+  });
+</script>

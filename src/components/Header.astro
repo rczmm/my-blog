@@ -1,0 +1,183 @@
+---
+// Header 组件
+---
+
+<header class="main-header">
+  <div class="header-container">
+    <!-- Logo 和网站标题 -->
+    <div class="logo-section">
+      <a href="/" class="logo-link">
+        <div class="logo">📝</div>
+        <span class="site-title">我的博客</span>
+      </a>
+    </div>
+
+    <!-- 导航菜单 -->
+    <nav class="main-nav">
+      <ul class="nav-list">
+        <li><a href="/" class="nav-link">🏠 首页</a></li>
+        <li><a href="/about" class="nav-link">👤 关于我</a></li>
+        <li><a href="/archive" class="nav-link">📚 归档</a></li>
+        <li><a href="/tags" class="nav-link">🏷️ 标签</a></li>
+        <li><a href="/contact" class="nav-link">📮 联系</a></li>
+      </ul>
+    </nav>
+
+    <!-- 搜索框 -->
+    <div class="search-box">
+      <form action="/search" method="GET" class="search-form">
+        <input type="text" name="q" placeholder="搜索文章..." class="search-input">
+        <button type="submit" class="search-btn">🔍</button>
+      </form>
+    </div>
+
+    <!-- 移动端菜单按钮 -->
+    <button class="mobile-menu-btn">☰</button>
+  </div>
+</header>
+
+<style>
+  .main-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+
+  .header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .logo-section {
+    flex-shrink: 0;
+  }
+
+  .logo-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: white;
+    font-weight: 700;
+    font-size: 1.2rem;
+  }
+
+  .logo {
+    font-size: 2rem;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+  }
+
+  .site-title {
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  }
+
+  .main-nav {
+    flex: 1;
+  }
+
+  .nav-list {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 2rem;
+    justify-content: center;
+  }
+
+  .nav-link {
+    color: white;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .nav-link:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateY(-2px);
+  }
+
+  .search-form {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .search-input {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(10px);
+    width: 200px;
+    font-size: 0.9rem;
+    outline: none;
+    transition: all 0.3s ease;
+  }
+
+  .search-input:focus {
+    background: white;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.3);
+    width: 250px;
+  }
+
+  .search-btn {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    padding: 0.5rem;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+  }
+
+  .search-btn:hover {
+    background: rgba(255,255,255,0.3);
+    transform: scale(1.1);
+  }
+
+  .mobile-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .header-container {
+      padding: 0.75rem 1rem;
+      gap: 1rem;
+    }
+
+    .main-nav {
+      display: none;
+    }
+
+    .search-box {
+      display: none;
+    }
+
+    .mobile-menu-btn {
+      display: block;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .site-title {
+      display: none;
+    }
+  }
+</style>

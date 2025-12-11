@@ -1,0 +1,246 @@
+---
+// ECharts 活动日历热力图组件
+export interface Props {
+  posts?: any[];
+}
+
+const { posts = [] } = Astro.props;
+
+function generateActivityData(posts: any[]) {
+  const data: [string, number][] = [];
+  const dateCountMap: { [key: string]: number } = {};
+  
+  // 生成过去一年的日期范围
+  const today = new Date();
+  const oneYearAgo = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
+  
+  // 初始化所有日期为0
+  for (let d = new Date(oneYearAgo); d <= today; d.setDate(d.getDate() + 1)) {
+    const dateStr = d.toISOString().split('T')[0];
+    dateCountMap[dateStr] = 0;
+  }
+  
+  // 根据文章发布日期增加活动
+  posts.forEach(post => {
+    if (post.frontmatter?.pubDate) {
+      const pubDate = new Date(post.frontmatter.pubDate);
+      const dateStr = pubDate.toISOString().split('T')[0];
+      if (dateCountMap.hasOwnProperty(dateStr)) {
+        dateCountMap[dateStr] += 3; // 发布文章算3次活动
+      }
+    }
+  });
+  
+  // 添加一些随机活动来模拟编码活动
+  Object.keys(dateCountMap).forEach(date => {
+    if (Math.random() > 0.7) {
+      dateCountMap[date] += Math.floor(Math.random() * 5) + 1;
+    }
+  });
+  
+  // 转换为ECharts需要的格式
+  Object.entries(dateCountMap).forEach(([date, count]) => {
+    data.push([date, count]);
+  });
+  
+  return data;
+}
+
+const activityData = generateActivityData(posts);
+const totalContributions = activityData.reduce((sum, [_, count]) => sum + count, 0);
+---
+
+<section class="activity-calendar">
+  <div class="calendar-container">
+    <div class="calendar-header">
+      <h3>📊 活动热力图</h3>
+      <p>过去一年共有 <strong>{totalContributions}</strong> 次活动</p>
+    </div>
+    
+    <!-- ECharts 容器 -->
+    <div id="activity-chart" class="chart-container"></div>
+    
+    <div class="calendar-legend">
+      <span>少</span>
+      <div class="legend-squares">
+        <div class="legend-square level-0"></div>
+        <div class="legend-square level-1"></div>
+        <div class="legend-square level-2"></div>
+        <div class="legend-square level-3"></div>
+        <div class="legend-square level-4"></div>
+      </div>
+      <span>多</span>
+    </div>
+  </div>
+</section>
+
+
+
+<style>
+  .activity-calendar {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    margin: 2rem 0;
+  }
+
+  .calendar-header h3 {
+    margin: 0 0 0.5rem 0;
+    color: #2d3748;
+  }
+
+  .calendar-header p {
+    color: #718096;
+    margin: 0 0 1rem 0;
+    font-size: 0.9rem;
+  }
+
+  .chart-container {
+    width: 100%;
+    height: 200px;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    background: #fafafa;
+  }
+
+  .calendar-legend {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: #718096;
+  }
+
+  .legend-squares {
+    display: flex;
+    gap: 2px;
+  }
+
+  .legend-square {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+  }
+
+  /* 响应式设计 */
+  @media (max-width: 768px) {
+    .activity-calendar {
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+
+    .chart-container {
+      height: 160px;
+    }
+  }
+</style>
+
+<script define:vars={{ activityData }}>
+  // 异步加载ECharts
+  let echarts;
+  
+  async function loadECharts() {
+    if (typeof window !== 'undefined') {
+      echarts = await import('echarts');
+      initChart();
+    }
+  }
+  
+  function initChart() {
+    const chartDom = document.getElementById('activity-chart');
+    if (!chartDom || !echarts) {
+      console.error('ActivityCalendar: 找不到图表容器或ECharts未加载');
+      return;
+    }
+    
+    const myChart = echarts.init(chartDom);
+    
+    console.log('ActivityCalendar: ECharts 初始化成功');
+    console.log('ActivityCalendar: 数据项数:', activityData.length);
+    
+    if (activityData.length > 0) {
+      console.log('ActivityCalendar: 第一项数据:', activityData[0]);
+      console.log('ActivityCalendar: 最后一项数据:', activityData[activityData.length - 1]);
+    }
+    
+    // 计算日期范围
+    const today = new Date();
+    const oneYearAgo = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
+    
+    const option = {
+      tooltip: {
+        formatter: function(params) {
+          const date = new Date(params.data[0]).toLocaleDateString('zh-CN');
+          const count = params.data[1];
+          return `${date}<br/>活动次数: ${count}`;
+        }
+      },
+      visualMap: {
+        min: 0,
+        max: 15,
+        type: 'piecewise',
+        orient: 'horizontal',
+        left: 'center',
+        bottom: 10,
+        pieces: [
+          {min: 0, max: 0, color: '#ebedf0'},
+          {min: 1, max: 3, color: '#9be9a8'},
+          {min: 4, max: 6, color: '#40c463'},
+          {min: 7, max: 10, color: '#30a14e'},
+          {min: 11, max: 15, color: '#216e39'}
+        ],
+        text: ['多', '少'],
+        textStyle: {
+          color: '#718096',
+          fontSize: 12
+        }
+      },
+      calendar: {
+        top: 30,
+        left: 30,
+        right: 30,
+        bottom: 60,
+        cellSize: ['auto', 13],
+        range: [oneYearAgo.toISOString().split('T')[0], today.toISOString().split('T')[0]],
+        itemStyle: {
+          borderWidth: 0.5,
+          borderColor: '#e2e8f0'
+        },
+        yearLabel: {
+          show: false
+        },
+        monthLabel: {
+          nameMap: 'cn',
+          fontSize: 12,
+          color: '#718096'
+        },
+        dayLabel: {
+          nameMap: 'cn',
+          fontSize: 10,
+          color: '#718096'
+        }
+      },
+      series: {
+        type: 'heatmap',
+        coordinateSystem: 'calendar',
+        data: activityData
+      }
+    };
+    
+    myChart.setOption(option);
+    
+    // 响应式处理
+    window.addEventListener('resize', function() {
+      myChart.resize();
+    });
+    
+    console.log('ActivityCalendar: 图表配置完成');
+  }
+  
+  // 页面加载完成后初始化
+  document.addEventListener('DOMContentLoaded', function() {
+    loadECharts();
+  });
+</script>
