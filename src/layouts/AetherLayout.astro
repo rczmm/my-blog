@@ -31,17 +31,17 @@ const { title } = Astro.props;
 
   <!-- HUD: 左上角状态栏 -->
   <div class="hud-status">
-    <span class="hud-text">[Aether Lab | Status: <span class="status-online">Online</span>]</span>
+    <span class="hud-text">[Aether Lab | 状态: <span class="status-online">在线</span>]</span>
   </div>
 
   <!-- HUD: 右下角数据读数 -->
   <div class="hud-data">
     <div class="data-row">
-      <span class="label">SYS.TEMP</span>
+      <span class="label">核心温度</span>
       <span class="value">22.5°C</span>
     </div>
     <div class="data-row">
-      <span class="label">NET.NODES</span>
+      <span class="label">网络节点</span>
       <span class="value" id="node-count">80</span>
     </div>
   </div>

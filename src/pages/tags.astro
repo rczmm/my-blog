@@ -29,15 +29,15 @@ function formatDate(date: string) {
   <div class="tags-container">
     <!-- 页面头部 -->
     <header class="tags-header glass-card">
-      <h1>TAG_INDEX</h1>
+      <h1>标签索引</h1>
       <div class="tags-stats">
         <span class="stat-item">
-          <span class="label">TAGS:</span>
+          <span class="label">标签:</span>
           <span class="value">{sortedTags.length}</span>
         </span>
         <span class="divider">|</span>
         <span class="stat-item">
-          <span class="label">LOGS:</span>
+          <span class="label">日志:</span>
           <span class="value">{allPosts.length}</span>
         </span>
       </div>
@@ -45,7 +45,7 @@ function formatDate(date: string) {
 
     <!-- 标签云 -->
     <section class="tag-cloud-section glass-card">
-      <div class="section-title">CLOUD_VISUALIZATION</div>
+      <div class="section-title">云端可视化</div>
       <div class="tag-cloud">
         {sortedTags.map(([tag, count], index) => (
           <a 
@@ -80,7 +80,7 @@ function formatDate(date: string) {
               <h3 class="tag-title">
                 <span class="hash">#</span>{tag}
               </h3>
-              <span class="tag-count-badge">COUNT: {count}</span>
+              <span class="tag-count-badge">数量: {count}</span>
             </div>
             
             <div class="tag-posts">
@@ -90,7 +90,7 @@ function formatDate(date: string) {
                   <div class="post-status"></div>
                   <div class="post-info">
                     <div class="post-meta-top">
-                      <span class="post-id">LOG_{post.url?.split('/').pop()?.slice(0,4).toUpperCase()}</span>
+                      <span class="post-id">日志_{post.url?.split('/').pop()?.slice(0,4).toUpperCase()}</span>
                       <time class="post-date">{formatDate(post.frontmatter.pubDate)}</time>
                     </div>
                     <h4 class="post-title">

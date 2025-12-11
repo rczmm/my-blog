@@ -11,7 +11,7 @@ const featuredPosts = posts.slice(0, 3); // 取前3篇文章作为精选
 <section class="hologram-deck">
   <div class="deck-header">
     <div class="header-line"></div>
-    <h2 class="deck-title">FEATURED_LOGS</h2>
+    <h2 class="deck-title">精选日志</h2>
     <div class="header-line"></div>
   </div>
   
@@ -25,7 +25,7 @@ const featuredPosts = posts.slice(0, 3); // 取前3篇文章作为精选
         <div class="visual-circle inner"></div>
       </div>
       <div class="visual-data">
-        <span>SCANNING...</span>
+        <span>扫描中...</span>
         <span id="scan-progress">100%</span>
       </div>
     </div>
@@ -36,7 +36,7 @@ const featuredPosts = posts.slice(0, 3); // 取前3篇文章作为精选
         {featuredPosts.map((post, index) => (
           <div class="panel-slide" data-slide={index}>
             <div class="slide-header">
-              <span class="slide-id">LOG_00{index + 1}</span>
+              <span class="slide-id">日志_00{index + 1}</span>
               <div class="slide-tags">
                 {post.frontmatter.tags && post.frontmatter.tags.map((tag: string) => (
                   <span class="tag-bracket">[{tag}]</span>
@@ -50,11 +50,11 @@ const featuredPosts = posts.slice(0, 3); // 取前3篇文章作为精选
             
             <div class="slide-meta-grid">
               <div class="meta-item">
-                <span class="meta-label">AUTHOR</span>
+                <span class="meta-label">作者</span>
                 <span class="meta-value">{post.frontmatter.author || 'SYSTEM'}</span>
               </div>
               <div class="meta-item">
-                <span class="meta-label">DATE</span>
+                <span class="meta-label">日期</span>
                 <span class="meta-value">{new Date(post.frontmatter.pubDate).toLocaleDateString('zh-CN')}</span>
               </div>
             </div>
@@ -65,7 +65,7 @@ const featuredPosts = posts.slice(0, 3); // 取前3篇文章作为精选
             </p>
             
             <a href={post.url} class="access-btn">
-              ACCESS_DATA
+              访问数据
             </a>
           </div>
         ))}

@@ -32,15 +32,15 @@ function formatDate(date: string) {
     <!-- 页面头部 -->
     <header class="archive-header glass-card">
       <div class="header-content">
-        <h1>DATA_ARCHIVE</h1>
+        <h1>数据归档</h1>
         <div class="archive-stats">
           <div class="stat-pill">
-            <span class="label">TOTAL_LOGS:</span>
+            <span class="label">日志总数:</span>
             <span class="value">{allPosts.length}</span>
           </div>
           <div class="stat-pill">
-            <span class="label">TIME_SPAN:</span>
-            <span class="value">{years.length} YRS</span>
+            <span class="label">时间跨度:</span>
+            <span class="value">{years.length} 年</span>
           </div>
         </div>
       </div>
@@ -76,7 +76,7 @@ function formatDate(date: string) {
                   )}
                 </div>
                 <div class="item-status">
-                  <span class="status-ok">LOGGED</span>
+                  <span class="status-ok">已记录</span>
                 </div>
               </article>
             ))}
@@ -88,8 +88,8 @@ function formatDate(date: string) {
     {allPosts.length === 0 && (
       <div class="empty-state glass-card">
         <div class="empty-icon">⚠</div>
-        <h2>NO_DATA_FOUND</h2>
-        <p>Database is empty. Waiting for input...</p>
+        <h2>暂无数据</h2>
+        <p>数据库为空。等待输入...</p>
       </div>
     )}
   </div>

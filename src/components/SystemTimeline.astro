@@ -1,0 +1,168 @@
+---
+// 系统更新日志组件 (System Timeline)
+export interface Props {
+  posts: any[];
+}
+
+const { posts = [] } = Astro.props;
+
+// 格式化日期
+function formatDate(dateStr: string) {
+  const date = new Date(dateStr);
+  return `${date.getFullYear()}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getDate().toString().padStart(2, '0')}`;
+}
+
+// 仅展示最近的 5 条记录
+const recentPosts = posts.slice(0, 5);
+---
+
+<section class="system-timeline">
+  <div class="timeline-header">
+    <h3>📡 系统更新日志</h3>
+    <p>系统更新记录</p>
+  </div>
+
+  <div class="timeline-container">
+    {recentPosts.map((post, index) => (
+      <div class="timeline-item">
+        <div class="timeline-date">{formatDate(post.frontmatter.pubDate)}</div>
+        <div class="timeline-marker">
+          <div class="marker-dot"></div>
+          <div class="marker-line"></div>
+        </div>
+        <div class="timeline-content glass-card-sm">
+          <a href={post.url} class="timeline-link">
+            <span class="version-tag">v1.0.{posts.length - index}</span>
+            <h4 class="post-title">{post.frontmatter.title}</h4>
+          </a>
+        </div>
+      </div>
+    ))}
+    
+    {posts.length === 0 && (
+      <div class="no-data">暂无更新记录</div>
+    )}
+  </div>
+</section>
+
+<style>
+  .system-timeline {
+    padding: 1rem;
+    color: var(--color-text-body);
+  }
+
+  .timeline-header {
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 1px dashed var(--color-neutral-light);
+    padding-bottom: 0.5rem;
+  }
+
+  .timeline-header h3 {
+    margin: 0;
+    color: var(--color-primary-start);
+    font-size: 1.2rem;
+  }
+
+  .timeline-header p {
+    margin: 0;
+    font-size: 0.8rem;
+    font-family: var(--font-mono);
+    opacity: 0.7;
+  }
+
+  .timeline-container {
+    position: relative;
+    padding-left: 1rem;
+  }
+
+  .timeline-item {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+
+  .timeline-item:last-child .marker-line {
+    display: none;
+  }
+
+  .timeline-date {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: var(--color-neutral);
+    padding-top: 0.5rem;
+    min-width: 100px;
+    text-align: right;
+  }
+
+  .timeline-marker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 20px;
+    padding-top: 0.6rem;
+  }
+
+  .marker-dot {
+    width: 10px;
+    height: 10px;
+    background: var(--color-primary-start);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--color-primary-start);
+    z-index: 2;
+  }
+
+  .marker-line {
+    width: 2px;
+    flex-grow: 1;
+    background: linear-gradient(to bottom, var(--color-primary-start), transparent);
+    opacity: 0.3;
+    min-height: 40px;
+    margin-top: 5px;
+  }
+
+  .timeline-content {
+    flex: 1;
+    padding: 0.8rem 1.2rem;
+    border-radius: 6px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .timeline-content:hover {
+    transform: translateX(5px);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--color-primary-start);
+  }
+
+  .timeline-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  .version-tag {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-secondary);
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+
+  .post-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--color-text-title);
+  }
+
+  .no-data {
+    text-align: center;
+    padding: 2rem;
+    opacity: 0.6;
+  }
+</style>

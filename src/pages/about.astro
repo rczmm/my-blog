@@ -13,9 +13,9 @@ const daysDiff = Math.ceil((today.getTime() - startDate.getTime()) / (1000 * 60 
 
 // 技能数据
 const skills = [
-  { name: 'JavaScript', level: 90 },
+  { name: 'Java', level: 90 },
   { name: 'TypeScript', level: 85 },
-  { name: 'React', level: 88 },
+  { name: 'SpringBoot', level: 88 },
   { name: 'Vue.js', level: 82 },
   { name: 'Node.js', level: 80 },
   { name: 'CSS/Sass', level: 85 },
@@ -27,25 +27,25 @@ const skills = [
 const timeline = [
   {
     year: '2023',
-    title: 'SYSTEM_INIT',
+    title: '系统初始化',
     description: 'Aether Lab 系统初始化，开始记录技术日志',
     icon: '🚀'
   },
   {
     year: '2022',
-    title: 'FULL_STACK_DEV',
+    title: '全栈开发',
     description: '扩展至后端领域，掌握 React 和 Node.js 核心技术',
     icon: '💼'
   },
   {
     year: '2021',
-    title: 'FRONTEND_UPGRADE',
+    title: '前端进阶',
     description: '深入研究现代前端框架，优化交互体验',
     icon: '📈'
   },
   {
     year: '2020',
-    title: 'HELLO_WORLD',
+    title: '你好，世界',
     description: '接触编程世界，开启 HTML/CSS/JS 之旅',
     icon: '🌱'
   }
@@ -64,26 +64,23 @@ const timeline = [
           </div>
           <div class="status-indicator">
             <span class="status-dot"></span>
-            <span class="status-text">STATUS: CODING</span>
+            <span class="status-text">状态: 编码中</span>
           </div>
         </div>
         
         <div class="intro-section">
-          <h1>IDENTITY_VERIFIED: <span class="highlight">DEVELOPER</span></h1>
+          <h1>身份验证: <span class="highlight">开发者</span></h1>
           <p class="intro-text">
             &gt; 热爱技术的前端工程师，专注于创造优雅的用户体验。<br/>
             &gt; 喜欢探索新技术，分享学习心得，与技术社区一起成长。
           </p>
           
           <div class="contact-links">
-            <a href="mailto:your.email@example.com" class="contact-link">
-              [EMAIL]
+            <a href="mailto:3179623450@qq.com" class="contact-link">
+              [邮件]
             </a>
-            <a href="https://github.com/yourusername" class="contact-link">
-              [GITHUB]
-            </a>
-            <a href="https://twitter.com/yourusername" class="contact-link">
-              [TWITTER]
+            <a href="https://github.com/rczmm" class="contact-link">
+              [代码库]
             </a>
           </div>
         </div>
@@ -92,11 +89,11 @@ const timeline = [
 
     <!-- 统计信息 -->
     <section class="stats-section glass-card">
-      <div class="section-title">SYSTEM_STATS</div>
+      <div class="section-title">系统统计</div>
       <div class="stats-grid">
         <div class="stat-item">
           <div class="stat-value">{totalPosts}</div>
-          <div class="stat-label">LOGS_COUNT</div>
+          <div class="stat-label">日志数量</div>
         </div>
         <div class="stat-item">
           <div class="stat-value">{totalTags}</div>
@@ -111,7 +108,7 @@ const timeline = [
 
     <!-- 技能条 -->
     <section class="skills-section glass-card">
-      <div class="section-title">SKILL_MATRIX</div>
+      <div class="section-title">技能矩阵</div>
       <div class="skills-grid">
         {skills.map(skill => (
           <div class="skill-item">
@@ -129,7 +126,7 @@ const timeline = [
 
     <!-- 时间线 -->
     <section class="timeline-section glass-card">
-      <div class="section-title">CHRONICLES</div>
+      <div class="section-title">时间线</div>
       <div class="timeline">
         {timeline.map((item, index) => (
           <div class="timeline-item">
