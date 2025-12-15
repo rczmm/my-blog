@@ -1,5 +1,5 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import AetherLayout from '../layouts/AetherLayout.astro';
 
 // 获取所有博客文章
 const allPosts = await Astro.glob('./posts/*.md');
@@ -15,56 +15,59 @@ const searchData = allPosts.map(post => ({
 }));
 ---
 
-<BaseLayout title="搜索 - 我的博客">
-  <div class="search-container">
+<AetherLayout title="搜索 - 我的博客">
+  <div class="search-page-container">
     <!-- 搜索头部 -->
-    <header class="search-header">
-      <h1>🔍 搜索文章</h1>
+    <header class="search-header glass-card">
+      <h1><span class="icon">🔍</span> 数据检索</h1>
       <p class="search-subtitle">
-        在 <strong>{allPosts.length}</strong> 篇文章中快速找到您需要的内容
+        在数据库中的 <strong>{allPosts.length}</strong> 条记录中检索目标
       </p>
     </header>
 
     <!-- 搜索框 -->
-    <div class="search-box-container">
-      <div class="search-box">
+    <div class="search-box-container glass-card">
+      <div class="search-input-wrapper">
         <input 
           type="text" 
           id="searchInput" 
-          placeholder="输入关键词搜索文章..." 
+          placeholder="输入指令或关键词..." 
           class="search-input"
           autocomplete="off"
         >
         <button class="search-btn" id="searchBtn">
-          🔍
+          执行检索
         </button>
       </div>
       
       <!-- 搜索建议 -->
       <div class="search-suggestions" id="searchSuggestions">
         <div class="suggestion-category">
-          <h3>🔥 热门标签</h3>
+          <h3><span class="blinking-cursor">></span> 热门索引</h3>
           <div class="tag-suggestions">
+            <button class="suggestion-tag" data-tag="Java">Java</button>
             <button class="suggestion-tag" data-tag="Astro">Astro</button>
             <button class="suggestion-tag" data-tag="前端">前端</button>
-            <button class="suggestion-tag" data-tag="性能优化">性能优化</button>
-            <button class="suggestion-tag" data-tag="Markdown">Markdown</button>
+            <button class="suggestion-tag" data-tag="实战">实战</button>
           </div>
         </div>
       </div>
     </div>
 
     <!-- 搜索结果 -->
-    <div class="search-results" id="searchResults">
-      <!-- 默认显示所有文章 -->
+    <div class="search-results-container">
       <div class="results-header">
-        <h2>📚 所有文章</h2>
-        <span class="results-count" id="resultsCount">{allPosts.length} 篇文章</span>
+        <h2>检索结果</h2>
+        <span class="results-count" id="resultsCount">匹配: {allPosts.length}</span>
       </div>
       
       <div class="results-grid" id="resultsGrid">
-        {allPosts.map((post) => (
-          <article class="result-card">
+        {allPosts.map((post, index) => (
+          <article class="result-card data-chip">
+            <div class="chip-header">
+              <span class="chip-id">NO.{String(index + 1).padStart(3, '0')}</span>
+              <div class="chip-decoration-line"></div>
+            </div>
             <div class="result-content">
               <h3 class="result-title">
                 <a href={post.url}>{post.frontmatter.title}</a>
@@ -75,415 +78,96 @@ const searchData = allPosts.map(post => ({
               </p>
               
               <div class="result-meta">
-                <time class="result-date">
-                  📅 {new Date(post.frontmatter.pubDate).toLocaleDateString('zh-CN')}
-                </time>
+                <span class="result-date">
+                  {new Date(post.frontmatter.pubDate).toLocaleDateString('zh-CN')}
+                </span>
                 
-                {post.frontmatter.author && (
-                  <span class="result-author">
-                    👤 {post.frontmatter.author}
-                  </span>
+                {post.frontmatter.tags && post.frontmatter.tags.length > 0 && (
+                  <div class="result-tags">
+                    {post.frontmatter.tags.slice(0, 3).map((tag: string) => (
+                      <span class="result-tag">{tag}</span>
+                    ))}
+                  </div>
                 )}
               </div>
-              
-              {post.frontmatter.tags && post.frontmatter.tags.length > 0 && (
-                <div class="result-tags">
-                  {post.frontmatter.tags.slice(0, 3).map((tag: string) => (
-                    <span class="result-tag">{tag}</span>
-                  ))}
-                </div>
-              )}
             </div>
           </article>
         ))}
       </div>
     </div>
-
-    <!-- 无结果状态 -->
-    <div class="no-results" id="noResults" style="display: none;">
-      <div class="no-results-icon">🔍</div>
-      <h2>未找到相关文章</h2>
-      <p>尝试使用不同的关键词或浏览所有文章</p>
-      <button class="clear-search-btn" id="clearSearch">
-        清除搜索
-      </button>
-    </div>
   </div>
-</BaseLayout>
 
-<style>
-  .search-container {
-    max-width: 900px;
-    margin: 0 auto;
-  }
-
-  .search-header {
-    text-align: center;
-    margin-bottom: 3rem;
-    padding: 2rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 12px;
-    color: white;
-  }
-
-  .search-header h1 {
-    margin: 0 0 1rem 0;
-    font-size: 2.5rem;
-    font-weight: 700;
-  }
-
-  .search-subtitle {
-    margin: 0;
-    font-size: 1.1rem;
-    opacity: 0.9;
-  }
-
-  .search-subtitle strong {
-    font-weight: 600;
-  }
-
-  /* 搜索框样式 */
-  .search-box-container {
-    margin-bottom: 3rem;
-  }
-
-  .search-box {
-    display: flex;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    border: 2px solid #e2e8f0;
-    transition: all 0.3s ease;
-  }
-
-  .search-box:focus-within {
-    border-color: #3182ce;
-    box-shadow: 0 8px 24px rgba(49, 130, 206, 0.2);
-  }
-
-  .search-input {
-    flex: 1;
-    padding: 1rem 1.5rem;
-    border: none;
-    font-size: 1.1rem;
-    outline: none;
-    background: transparent;
-  }
-
-  .search-input::placeholder {
-    color: #a0aec0;
-  }
-
-  .search-btn {
-    background: #3182ce;
-    border: none;
-    color: white;
-    padding: 1rem 1.5rem;
-    font-size: 1.2rem;
-    cursor: pointer;
-    transition: background 0.3s ease;
-  }
-
-  .search-btn:hover {
-    background: #2c5aa0;
-  }
-
-  /* 搜索建议 */
-  .search-suggestions {
-    margin-top: 2rem;
-    background: white;
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-    border: 1px solid #e2e8f0;
-  }
-
-  .suggestion-category h3 {
-    margin: 0 0 1rem 0;
-    color: #2d3748;
-    font-size: 1.1rem;
-  }
-
-  .tag-suggestions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-  }
-
-  .suggestion-tag {
-    background: #edf2f7;
-    color: #4a5568;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .suggestion-tag:hover {
-    background: #e2e8f0;
-    transform: translateY(-2px);
-  }
-
-  /* 搜索结果 */
-  .results-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid #e2e8f0;
-  }
-
-  .results-header h2 {
-    margin: 0;
-    color: #2d3748;
-    font-size: 1.8rem;
-  }
-
-  .results-count {
-    color: #718096;
-    font-size: 1rem;
-    font-weight: 500;
-  }
-
-  .results-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 2rem;
-  }
-
-  .result-card {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-    transition: all 0.3s ease;
-    overflow: hidden;
-    border: 1px solid #e2e8f0;
-  }
-
-  .result-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-  }
-
-  .result-content {
-    padding: 1.5rem;
-  }
-
-  .result-title {
-    margin: 0 0 1rem 0;
-    font-size: 1.3rem;
-    line-height: 1.3;
-  }
-
-  .result-title a {
-    color: #2d3748;
-    text-decoration: none;
-    transition: color 0.2s ease;
-  }
-
-  .result-title a:hover {
-    color: #3182ce;
-  }
-
-  .result-description {
-    color: #718096;
-    line-height: 1.6;
-    margin: 0 0 1rem 0;
-  }
-
-  .result-meta {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    font-size: 0.875rem;
-    color: #a0aec0;
-    flex-wrap: wrap;
-  }
-
-  .result-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .result-tag {
-    background: #edf2f7;
-    color: #4a5568;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 500;
-  }
-
-  /* 高亮搜索结果 */
-  .highlight {
-    background: #fed7d7;
-    color: #c53030;
-    padding: 0.1rem 0.2rem;
-    border-radius: 3px;
-    font-weight: 600;
-  }
-
-  /* 无结果状态 */
-  .no-results {
-    text-align: center;
-    padding: 4rem 2rem;
-    color: #718096;
-  }
-
-  .no-results-icon {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-    opacity: 0.6;
-  }
-
-  .no-results h2 {
-    margin: 0 0 1rem 0;
-    color: #2d3748;
-  }
-
-  .no-results p {
-    margin: 0 0 2rem 0;
-    font-size: 1.1rem;
-  }
-
-  .clear-search-btn {
-    background: #3182ce;
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background 0.3s ease;
-  }
-
-  .clear-search-btn:hover {
-    background: #2c5aa0;
-  }
-
-  /* 响应式设计 */
-  @media (max-width: 768px) {
-    .search-header {
-      padding: 1.5rem;
-      margin-left: -1rem;
-      margin-right: -1rem;
-      border-radius: 0;
-    }
-
-    .search-header h1 {
-      font-size: 2rem;
-    }
-
-    .results-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .results-header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 1rem;
-    }
-
-    .search-input {
-      font-size: 1rem;
-    }
-  }
-</style>
-
-<script define:vars={{ searchData }}>
-  document.addEventListener('DOMContentLoaded', function() {
+  <script define:vars={{ searchData }}>
+    // 客户端搜索逻辑
     const searchInput = document.getElementById('searchInput');
     const searchBtn = document.getElementById('searchBtn');
     const resultsGrid = document.getElementById('resultsGrid');
     const resultsCount = document.getElementById('resultsCount');
-    const noResults = document.getElementById('noResults');
-    const searchResults = document.getElementById('searchResults');
-    const clearSearchBtn = document.getElementById('clearSearch');
     const suggestionTags = document.querySelectorAll('.suggestion-tag');
 
-    let currentResults = searchData;
-
-    function highlightText(text, query) {
-      if (!query) return text;
-      const regex = new RegExp(`(${query})`, 'gi');
-      return text.replace(regex, '<span class="highlight">$1</span>');
-    }
-
-    function renderResults(results, query = '') {
-      if (results.length === 0) {
-        searchResults.style.display = 'none';
-        noResults.style.display = 'block';
+    // 搜索函数
+    function performSearch(query) {
+      if (!query) {
+        renderResults(searchData);
         return;
       }
 
-      searchResults.style.display = 'block';
-      noResults.style.display = 'none';
+      const lowerQuery = query.toLowerCase();
+      const filteredData = searchData.filter(item => {
+        const titleMatch = item.title.toLowerCase().includes(lowerQuery);
+        const descMatch = item.description && item.description.toLowerCase().includes(lowerQuery);
+        const tagMatch = item.tags.some(tag => tag.toLowerCase().includes(lowerQuery));
+        return titleMatch || descMatch || tagMatch;
+      });
+
+      renderResults(filteredData);
+    }
+
+    // 渲染结果
+    function renderResults(results) {
+      resultsCount.textContent = `匹配: ${results.length}`;
       
-      resultsCount.textContent = `${results.length} 篇文章`;
-      
-      resultsGrid.innerHTML = results.map(post => `
-        <article class="result-card">
+      if (results.length === 0) {
+        resultsGrid.innerHTML = `
+          <div class="no-results glass-card">
+            <p>未找到匹配数据</p>
+          </div>
+        `;
+        return;
+      }
+
+      resultsGrid.innerHTML = results.map((post, index) => `
+        <article class="result-card data-chip">
+          <div class="chip-header">
+            <span class="chip-id">NO.${String(index + 1).padStart(3, '0')}</span>
+            <div class="chip-decoration-line"></div>
+          </div>
           <div class="result-content">
             <h3 class="result-title">
-              <a href="${post.url}">${highlightText(post.title, query)}</a>
+              <a href="${post.url}">${post.title}</a>
             </h3>
             
             <p class="result-description">
-              ${highlightText(post.description, query)}
+              ${post.description || ''}
             </p>
             
             <div class="result-meta">
-              <time class="result-date">
-                📅 ${new Date(post.pubDate).toLocaleDateString('zh-CN')}
-              </time>
-              ${post.author ? `
-                <span class="result-author">
-                  👤 ${post.author}
-                </span>
+              <span class="result-date">
+                ${new Date(post.pubDate).toLocaleDateString('zh-CN')}
+              </span>
+              
+              ${post.tags && post.tags.length > 0 ? `
+                <div class="result-tags">
+                  ${post.tags.slice(0, 3).map(tag => `<span class="result-tag">${tag}</span>`).join('')}
+                </div>
               ` : ''}
             </div>
-            
-            ${post.tags.length > 0 ? `
-              <div class="result-tags">
-                ${post.tags.slice(0, 3).map(tag => 
-                  `<span class="result-tag">${highlightText(tag, query)}</span>`
-                ).join('')}
-              </div>
-            ` : ''}
           </div>
         </article>
       `).join('');
     }
 
-    function performSearch(query) {
-      if (!query.trim()) {
-        currentResults = searchData;
-        renderResults(currentResults);
-        return;
-      }
-
-      const searchTerms = query.toLowerCase().split(' ').filter(term => term.length > 0);
-      
-      currentResults = searchData.filter(post => {
-        const searchableText = [
-          post.title,
-          post.description,
-          post.author || '',
-          ...(post.tags || [])
-        ].join(' ').toLowerCase();
-
-        return searchTerms.every(term => searchableText.includes(term));
-      });
-
-      renderResults(currentResults, query);
-    }
-
-    // 搜索事件
+    // 事件监听
     searchInput.addEventListener('input', (e) => {
       performSearch(e.target.value);
     });
@@ -492,29 +176,364 @@ const searchData = allPosts.map(post => ({
       performSearch(searchInput.value);
     });
 
-    // 回车键搜索
-    searchInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        performSearch(searchInput.value);
-      }
-    });
-
-    // 清除搜索
-    clearSearchBtn.addEventListener('click', () => {
-      searchInput.value = '';
-      performSearch('');
-    });
-
-    // 标签建议点击
     suggestionTags.forEach(tag => {
       tag.addEventListener('click', () => {
-        const tagName = tag.getAttribute('data-tag');
-        searchInput.value = tagName;
-        performSearch(tagName);
+        const tagValue = tag.getAttribute('data-tag');
+        searchInput.value = tagValue;
+        performSearch(tagValue);
       });
     });
+  </script>
 
-    // 初始渲染
-    renderResults(searchData);
-  });
-</script>
+  <style>
+    .search-page-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem;
+    }
+
+    /* 头部设计优化 */
+    .search-header {
+      padding: 2.5rem;
+      margin-bottom: 2.5rem;
+      border-left: 6px solid var(--color-primary-start);
+      background: linear-gradient(90deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4));
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 装饰性背景字 */
+    .search-header::before {
+      content: 'SEARCH_DATABASE';
+      position: absolute;
+      right: 20px;
+      bottom: 10px;
+      font-size: 3rem;
+      font-weight: 900;
+      color: var(--color-primary-start);
+      opacity: 0.05;
+      pointer-events: none;
+      font-family: var(--font-mono);
+      z-index: 0;
+    }
+
+    .search-header h1 {
+      margin: 0;
+      font-size: 2.2rem;
+      background: linear-gradient(135deg, var(--color-text-title), var(--color-primary-end));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .search-header .icon {
+      font-size: 1.8rem;
+      filter: drop-shadow(0 0 5px var(--color-accent-light));
+    }
+
+    .search-subtitle {
+      color: var(--color-neutral-dark);
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      margin: 0;
+      padding-left: 3.5rem; /* 对齐文字 */
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 搜索区域容器 */
+    .search-box-container {
+      padding: 2.5rem;
+      margin-bottom: 3rem;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+    }
+
+    .search-input-wrapper {
+      display: flex;
+      gap: 0; /* 移除 gap，让按钮紧贴 */
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      border-radius: 4px;
+      overflow: hidden; /* 保证圆角 */
+    }
+
+    .search-input {
+      flex: 1;
+      padding: 1.2rem 1.5rem;
+      border: none; /* 移除边框，由 wrapper 控制 */
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--color-text-body);
+      transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+      outline: none;
+      background: #fff;
+    }
+
+    /* 赛博风格按钮 */
+    .search-btn {
+      padding: 0 2.5rem;
+      background: var(--color-primary-start);
+      color: white;
+      border: none;
+      font-weight: 600;
+      font-family: var(--font-mono);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      clip-path: polygon(10% 0, 100% 0, 100% 100%, 0 100%, 0 20%); /* 切角效果 */
+      margin-left: -10px; /* 重叠一点 */
+    }
+
+    .search-btn:hover {
+      background: var(--color-primary-end);
+      padding-right: 3.5rem; /* hover 时伸长 */
+    }
+    
+    .search-btn::after {
+      content: '→';
+      position: absolute;
+      right: 1.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: 0;
+      transition: all 0.3s;
+    }
+    
+    .search-btn:hover::after {
+      opacity: 1;
+      right: 1.5rem;
+    }
+
+    /* 热门索引标题 */
+    .suggestion-category h3 {
+      font-size: 1rem;
+      color: var(--color-text-title);
+      margin-bottom: 1.2rem;
+      font-family: var(--font-mono);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--color-neutral-light);
+      padding-bottom: 0.5rem;
+      width: fit-content;
+    }
+    
+    .suggestion-category h3 .blinking-cursor {
+      color: var(--color-accent);
+      font-weight: bold;
+    }
+
+    .tag-suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    /* 标签样式优化 */
+    .suggestion-tag {
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid var(--color-neutral-light);
+      padding: 0.5rem 1.2rem;
+      border-radius: 0; /* 直角 */
+      font-size: 0.9rem;
+      font-family: var(--font-mono);
+      color: var(--color-text-body);
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      clip-path: polygon(0 0, 100% 0, 100% 80%, 90% 100%, 0 100%); /* 小切角 */
+    }
+
+    .suggestion-tag:hover {
+      background: var(--color-primary-start);
+      color: white;
+      border-color: var(--color-primary-start);
+      transform: translateY(-2px);
+    }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--color-neutral-light);
+    }
+
+    .results-header h2 {
+      font-size: 1.5rem;
+      margin: 0;
+      color: var(--color-text-title);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .results-header h2::before {
+      content: '';
+      display: block;
+      width: 6px;
+      height: 24px;
+      background: var(--color-accent);
+    }
+
+    .results-count {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      color: var(--color-neutral-dark);
+      background: rgba(0,0,0,0.05);
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+    }
+
+    .results-grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .search-page-container :global(.result-card) {
+      position: relative;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid var(--color-neutral-light);
+      border-radius: 4px; /* 微圆角，不那么硬 */
+      border-left: 4px solid var(--color-neutral); /* 左侧状态条 */
+    }
+
+    .search-page-container :global(.result-card:hover) {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      background: rgba(255, 255, 255, 0.95);
+      border-color: var(--color-primary-start);
+      border-left-color: var(--color-primary-start); /* 激活状态条 */
+      z-index: 10;
+    }
+
+    /* 芯片头部信息 - 简化版 */
+    .search-page-container :global(.chip-header) {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.8rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--color-neutral);
+    }
+
+    .search-page-container :global(.chip-decoration-line) {
+      flex: 1;
+      height: 1px;
+      background: var(--color-neutral-light);
+      margin-left: 1rem;
+      opacity: 0.5;
+    }
+
+    /* 内容区域 */
+    .search-page-container :global(.result-title) {
+      margin: 0 0 0.6rem 0;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    
+    .search-page-container :global(.result-title a) {
+      color: var(--color-text-title);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .search-page-container :global(.result-title a:hover) {
+      color: var(--color-primary-start);
+    }
+    
+    /* 去除所有下划线特效 */
+    .search-page-container :global(.result-title a::after) {
+      display: none;
+    }
+    
+    .search-page-container :global(.result-description) {
+      color: var(--color-text-body);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 1.2rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      opacity: 0.8;
+    }
+
+    .search-page-container :global(.result-meta) {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1rem;
+      padding-top: 0.8rem;
+      border-top: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .search-page-container :global(.result-date) {
+      font-size: 0.8rem;
+      color: var(--color-neutral);
+      font-family: var(--font-mono);
+    }
+    
+    .search-page-container :global(.result-tags) {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .search-page-container :global(.result-tag) {
+      background: var(--color-primary-light); /* 使用主题浅色 */
+      color: var(--color-primary-end);
+      padding: 0.2rem 0.6rem;
+      font-size: 0.75rem;
+      border-radius: 12px; /* 胶囊圆角 */
+      font-weight: 500;
+      opacity: 0.9;
+    }
+
+    /* 移除之前的动画和装饰类 */
+    .search-page-container :global(.chip-corner),
+    .search-page-container :global(.chip-scanline),
+    .search-page-container :global(.chip-status),
+    .search-page-container :global(.meta-item),
+    .search-page-container :global(.meta-label),
+    .search-page-container :global(.result-date::before) {
+      display: none;
+    }
+
+    .search-page-container :global(.no-results) {
+      text-align: center;
+      padding: 4rem;
+      color: var(--color-neutral);
+      font-family: var(--font-mono);
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px dashed var(--color-neutral-light);
+      border-radius: 8px;
+    }
+
+    .blinking-cursor {
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+  </style>
+</AetherLayout>
