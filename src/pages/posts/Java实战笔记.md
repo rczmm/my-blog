@@ -309,3 +309,206 @@ try (PDDocument document = PDDocument.load(new File("demo.pdf"))) {
     }
 }
 ```
+
+## 6. Maven 常用操作
+
+### 6.1 常用命令
+
+| 命令 | 描述 |
+| :--- | :--- |
+| `mvn clean` | 清理项目，删除 target 目录 |
+| `mvn compile` | 编译源代码 |
+| `mvn test` | 运行测试 |
+| `mvn package` | 打包项目 (生成 jar 或 war) |
+| `mvn install` | 安装包到本地仓库 |
+| `mvn deploy` | 部署包到远程仓库 |
+| `mvn dependency:tree` | 查看依赖树 (排查冲突神器) |
+
+### 6.2 依赖管理技巧
+
+**排除依赖 (Exclusions)**
+
+当出现依赖冲突（如引入了不同版本的 logging 库）时，可以使用 `<exclusions>` 排除不需要的传递依赖。
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+    <exclusions>
+        <exclusion>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+```
+
+**依赖范围 (Scope)**
+
+*   **compile** (默认): 编译、测试、运行都有效。
+*   **provided**: 编译、测试有效，运行时由容器提供 (如 Servlet API)。
+*   **runtime**: 测试、运行有效，编译无效 (如 JDBC 驱动)。
+*   **test**: 仅测试有效 (如 JUnit)。
+
+## 7. Spring Boot SSE (Server-Sent Events)
+
+SSE 是一种轻量级的服务端推送技术，基于 HTTP 协议，适合单向推送场景（如股票行情、日志推送）。
+
+### 7.1 后端实现
+
+```java
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+@RestController
+public class SseController {
+
+    private final ExecutorService executor = Executors.newCachedThreadPool();
+
+    @GetMapping("/sse/stream")
+    public SseEmitter handleSse() {
+        // 设置超时时间，0 表示不过期
+        SseEmitter emitter = new SseEmitter(0L);
+
+        executor.execute(() -> {
+            try {
+                for (int i = 0; i < 10; i++) {
+                    // 发送数据
+                    emitter.send(SseEmitter.event()
+                        .name("message")
+                        .data("推送消息 " + i));
+                    Thread.sleep(1000);
+                }
+                // 完成推送
+                emitter.complete();
+            } catch (Exception e) {
+                emitter.completeWithError(e);
+            }
+        });
+
+        return emitter;
+    }
+}
+```
+
+### 7.2 前端接收 (HTML + JS)
+
+```html
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>SSE 测试</h1>
+    <div id="result"></div>
+    <script>
+        // 连接 SSE 接口
+        const eventSource = new EventSource('/sse/stream');
+
+        // 监听消息
+        eventSource.onmessage = function(event) {
+            const div = document.getElementById('result');
+            div.innerHTML += event.data + '<br>';
+        };
+
+        // 监听自定义事件
+        eventSource.addEventListener('message', function(event) {
+             console.log("收到数据:", event.data);
+        });
+
+        eventSource.onerror = function(err) {
+            console.error("连接错误:", err);
+            eventSource.close();
+        };
+    </script>
+</body>
+</html>
+```
+
+## 8. WebSocket
+
+WebSocket 提供全双工通信，适合聊天室、在线游戏等需要高实时性双向交互的场景。
+
+### 8.1 引入依赖
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-websocket</artifactId>
+</dependency>
+```
+
+### 8.2 开启 WebSocket 支持
+
+```java
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.socket.server.standard.ServerEndpointExporter;
+
+@Configuration
+public class WebSocketConfig {
+    
+    // 如果使用外部 Tomcat，则不需要此 Bean
+    @Bean
+    public ServerEndpointExporter serverEndpointExporter() {
+        return new ServerEndpointExporter();
+    }
+}
+```
+
+### 8.3 服务端端点
+
+```java
+import org.springframework.stereotype.Component;
+import javax.websocket.*;
+import javax.websocket.server.ServerEndpoint;
+import java.io.IOException;
+import java.util.concurrent.CopyOnWriteArraySet;
+
+@ServerEndpoint("/ws/chat")
+@Component
+public class WebSocketServer {
+
+    // 存储所有在线连接
+    private static final CopyOnWriteArraySet<WebSocketServer> webSocketSet = new CopyOnWriteArraySet<>();
+    private Session session;
+
+    @OnOpen
+    public void onOpen(Session session) {
+        this.session = session;
+        webSocketSet.add(this);
+        System.out.println("新连接加入！当前在线人数: " + webSocketSet.size());
+    }
+
+    @OnClose
+    public void onClose() {
+        webSocketSet.remove(this);
+        System.out.println("连接关闭！当前在线人数: " + webSocketSet.size());
+    }
+
+    @OnMessage
+    public void onMessage(String message, Session session) {
+        System.out.println("收到消息: " + message);
+        // 群发消息
+        for (WebSocketServer item : webSocketSet) {
+            try {
+                item.sendMessage("广播: " + message);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @OnError
+    public void onError(Session session, Throwable error) {
+        System.out.println("发生错误");
+        error.printStackTrace();
+    }
+
+    public void sendMessage(String message) throws IOException {
+        this.session.getBasicRemote().sendText(message);
+    }
+}
+```
