@@ -596,3 +596,75 @@ jad com.example.UserService
 5.  **热替换**: `retransform /tmp/com/example/UserService.class`
 
 > **注意**: 热更新不能新增方法或字段，只能修改现有方法逻辑。
+
+## 11. JDK 原生诊断命令
+
+虽然 Arthas 非常强大，但在某些受限环境下（如无法下载外部 Jar），JDK 自带的命令行工具仍是最后的防线。
+
+### 11.1 进程查询 (`jps`)
+
+查看当前运行的 Java 进程 ID。
+```bash
+jps -l  # 输出主类全名或 jar 路径
+jps -v  # 输出 JVM 参数
+```
+
+### 11.2 状态监控 (`jstat`)
+
+用于监视 JVM 各种堆和非堆的大小及其内存使用量、垃圾回收情况。
+```bash
+# 每 1000ms 查询一次进程 <pid> 的 GC 情况，查询 10 次
+jstat -gc <pid> 1000 10
+```
+**关键列含义**:
+*   **S0C/S1C**: 两个幸存区的容量。
+*   **EC/OC**: 伊甸园区/老年代的容量。
+*   **YGC/FGC**: 年轻代/全量 GC 的次数。
+*   **GCT**: GC 总耗时。
+
+### 11.3 内存分析 (`jmap`)
+
+用于生成堆转储快照（Heap Dump）或查看对象统计信息。
+
+**1. 查看对象直方图 (排查哪些对象占内存最多)**
+```bash
+jmap -histo <pid> | head -n 20
+```
+
+**2. 生成堆快照 (用于离线分析，如使用 MAT 或 VisualVM)**
+```bash
+jmap -dump:format=b,file=heap.hprof <pid>
+```
+
+**3. 查看堆配置信息**
+```bash
+jmap -heap <pid>
+```
+
+### 11.4 线程分析 (`jstack`)
+
+用于生成虚拟机当前时刻的线程快照，排查死锁、CPU 飙高、线程冻结等问题。
+```bash
+jstack -l <pid> > thread_dump.txt
+```
+*   查找 `waiting on condition` (等待资源) 或 `BLOCKED` (锁竞争)。
+
+### 11.5 全能工具 (`jcmd`)
+
+从 Java 7 开始引入，官方推荐使用 `jcmd` 替代大部分 `jmap`, `jstack` 等命令。
+
+```bash
+jcmd <pid> VM.uptime          # 查看启动时间
+jcmd <pid> GC.heap_info       # 查看堆概要信息
+jcmd <pid> Thread.print       # 打印线程栈 (同 jstack)
+jcmd <pid> GC.class_histogram # 查看类直方图 (同 jmap -histo)
+jcmd <pid> GC.heap_dump /tmp/dump.hprof # 生成堆快照
+```
+
+### 11.6 堆快照浏览器 (`jhat`)
+
+JDK 自带的简单分析工具（现已不推荐，通常建议使用更强大的 MAT 或 JVisualVM）。
+```bash
+jhat heap.hprof
+# 启动后访问 http://localhost:7000 查看分析结果
+```
