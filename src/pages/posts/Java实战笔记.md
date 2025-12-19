@@ -512,3 +512,87 @@ public class WebSocketServer {
     }
 }
 ```
+
+## 9. Linux 常用诊断命令
+
+在排查 Java 应用问题前，通常需要先查看系统层面的状态。
+
+### 9.1 CPU 与 进程
+
+*   `top`: 实时显示进程动态。按 `P` 按 CPU 排序，按 `M` 按内存排序。
+*   `top -Hp <pid>`: 查看某个进程下的所有线程占用情况 (排查 CPU 飙升神器)。
+*   `ps -ef | grep java`: 查看 Java 进程详情。
+
+### 9.2 内存与磁盘
+
+*   `free -h`: 查看系统内存使用情况。
+*   `df -h`: 查看磁盘空间占用。
+*   `du -sh *`: 查看当前目录下各个文件夹的大小。
+
+### 9.3 网络
+
+*   `netstat -ntlp`: 查看端口占用情况。
+*   `lsof -i:<port>`: 查看指定端口被哪个进程占用。
+*   `curl -X GET http://localhost:8080`: 终端发起 HTTP 请求。
+
+### 9.4 日志查询 (三剑客)
+
+*   `tail -f demo.log`: 实时滚动查看日志。
+*   `grep -C 5 "NullPointerException" demo.log`: 查找关键字及前后 5 行。
+*   `sed -n '/2023-12-01 10:00/,/2023-12-01 11:00/p' demo.log`: 按时间段截取日志。
+
+---
+
+## 10. Arthas 线上诊断工具
+
+Arthas 是阿里开源的 Java 诊断利器，无需重启即可排查问题。
+
+### 10.1 安装与启动
+
+```bash
+# 下载并启动 (会自动列出所有 Java 进程)
+curl -O https://arthas.aliyun.com/arthas-boot.jar
+java -jar arthas-boot.jar
+```
+
+### 10.2 常用命令实战
+
+#### 1. 查看大盘 (`dashboard`)
+实时查看 CPU、内存、线程、JVM 状态。
+
+#### 2. 排查高 CPU 线程 (`thread`)
+*   `thread -n 3`: 显示当前最忙的前 3 个线程堆栈。
+*   `thread <id>`: 查看指定线程状态。
+*   `thread -b`: 找出当前阻塞其他线程的线程 (排查死锁)。
+
+#### 3. 观测方法入参返回值 (`watch`)
+这是最常用的功能。
+```bash
+# 观察类 UserService 的 getUser 方法的入参和返回值，深度为 2
+watch com.example.UserService getUser "{params, returnObj}" -x 2
+```
+
+#### 4. 统计耗时 (`trace`)
+定位哪一步执行慢。
+```bash
+# 追踪方法调用链耗时，并过滤掉耗时小于 10ms 的调用
+trace com.example.OrderController createOrder '#cost > 10'
+```
+
+#### 5. 反编译代码 (`jad`)
+确认线上运行的代码是否为最新版本。
+```bash
+jad com.example.UserService
+```
+
+### 10.3 高级：不重启修改代码 (热更新)
+
+如果发现线上有个小 Bug 需要紧急修复：
+
+1.  **反编译**: `jad --source-output /tmp com.example.UserService`
+2.  **修改源码**: `vim /tmp/com/example/UserService.java`
+3.  **查找类加载器**: `sc -d com.example.UserService | grep classLoaderHash`
+4.  **编译新类**: `mc -c <hash> /tmp/com/example/UserService.java -d /tmp`
+5.  **热替换**: `retransform /tmp/com/example/UserService.class`
+
+> **注意**: 热更新不能新增方法或字段，只能修改现有方法逻辑。
