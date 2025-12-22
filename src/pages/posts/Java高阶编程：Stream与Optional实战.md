@@ -1,8 +1,8 @@
 ---
-title: 'Java 高阶编程：Stream 与 Optional 实战'
+title: 'Java 高阶编程：Stream 与 Optional'
 pubDate: 2025-12-22
 layout: '../../layouts/PostLayout.astro'
-description: '全方位掌握 Java 8+ 函数式编程：API 详解、复杂数据转换与生产实战场景'
+description: '全方位掌握 Java 8+ 函数式编程：API 详解、复杂数据转换与生产场景'
 author: 'rcz'
 tags:
   - "Java"
