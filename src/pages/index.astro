@@ -87,7 +87,7 @@ function formatDate(date: string) {
           <p>暂无数据</p>
         </div>
       ) : (
-        allPosts.slice(0, 6).map((post, index) => (
+        allPosts.slice(0, 8).map((post, index) => (
           <article class="post-card glass-card">
             <a href={post.url} class="card-link-overlay" aria-label={`Read ${post.frontmatter.title}`}></a>
             

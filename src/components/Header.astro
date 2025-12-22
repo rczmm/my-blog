@@ -1,5 +1,6 @@
 ---
 // Header 组件
+import { config } from '../config';
 ---
 
 <header class="main-header glass-card">
@@ -7,8 +8,8 @@
     <!-- Logo 和网站标题 -->
     <div class="logo-section">
       <a href="/" class="logo-link">
-        <div class="logo">🧬</div>
-        <span class="site-title">Aether Lab</span>
+        <div class="logo">{config.siteLogo}</div>
+        <span class="site-title">{config.siteName}</span>
       </a>
     </div>
 

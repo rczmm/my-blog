@@ -2,6 +2,7 @@
 import AetherParticles from '../components/AetherParticles.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import { config } from '../config';
 import '../styles/theme.css';
 
 export interface Props {
@@ -16,9 +17,9 @@ const { title } = Astro.props;
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/svg+xml" href={config.favicon} />
   <meta name="generator" content={Astro.generator} />
-  <title>{title} | Aether Lab</title>
+  <title>{title} | {config.titleSuffix}</title>
   
   <!-- 引入 Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,7 +32,7 @@ const { title } = Astro.props;
 
   <!-- HUD: 左上角状态栏 -->
   <div class="hud-status">
-    <span class="hud-text">[Aether Lab | 状态: <span class="status-online">在线</span>]</span>
+    <span class="hud-text">[{config.siteName} | 状态: <span class="status-online">在线</span>]</span>
   </div>
 
   <!-- HUD: 右下角数据读数 -->
