@@ -3,6 +3,11 @@ import AetherLayout from './AetherLayout.astro';
 
 const { frontmatter, headings } = Astro.props;
 
+// 计算字数和阅读时间
+const content = frontmatter.content || '';
+const wordCount = content.replace(/[#*`\-\[\]()\n\s]/g, '').length || (headings ? headings.length * 100 : 1200); // 如果没有content，按标题数量估算
+const readingTime = Math.ceil(wordCount / 400);
+
 // 格式化日期
 const formattedDate = new Date(frontmatter.pubDate).toLocaleDateString('zh-CN', {
   year: 'numeric',
@@ -10,221 +15,495 @@ const formattedDate = new Date(frontmatter.pubDate).toLocaleDateString('zh-CN', 
   day: 'numeric'
 });
 
-// 获取所有文章以用于推荐（简单实现，实际可能需要更复杂的逻辑）
+// 获取所有文章以用于推荐和导航
 const allPosts = await Astro.glob('../pages/posts/*.md');
-const recentPosts = allPosts
-  .sort((a, b) => new Date(b.frontmatter.pubDate).valueOf() - new Date(a.frontmatter.pubDate).valueOf())
-  .slice(0, 3);
+const sortedPosts = allPosts.sort((a, b) => new Date(b.frontmatter.pubDate).valueOf() - new Date(a.frontmatter.pubDate).valueOf());
+
+// 查找当前文章索引
+const currentPostIndex = sortedPosts.findIndex(post => post.url === Astro.url.pathname);
+const prevPost = currentPostIndex < sortedPosts.length - 1 ? sortedPosts[currentPostIndex + 1] : null;
+const nextPost = currentPostIndex > 0 ? sortedPosts[currentPostIndex - 1] : null;
+
+const recentPosts = sortedPosts.slice(0, 3);
 ---
 
 <AetherLayout title={frontmatter.title}>
-  <div class="layout-grid">
-    <!-- 主内容区 -->
-    <article class="post-container">
-      <!-- 文章头部 -->
-      <header class="post-header glass-card">
-        <div class="header-meta">
-          <span class="meta-item">
-            <span class="meta-label">ID</span>
-            <span class="meta-value">#{Math.floor(Math.random() * 9000) + 1000}</span>
-          </span>
-          <span class="meta-item">
-            <span class="meta-label">状态</span>
-            <span class="meta-value active">已发布</span>
-          </span>
-        </div>
-
-        <h1 class="post-title">{frontmatter.title}</h1>
-
-        <div class="post-info">
-          <div class="info-item">
-            <span class="info-icon">👤</span>
-            <span class="info-text">作者: {frontmatter.author}</span>
+  <div class="post-layout-wrapper">
+    <!-- 顶部标题卡片 - 占据较宽区域 -->
+    <header class="post-header glass-card">
+      <div class="post-card-layout">
+        <!-- 左侧图标区域 -->
+        <div class="post-icon-section">
+          <div class="stat-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
           </div>
-          <div class="info-item">
-            <span class="info-icon">📅</span>
-            <span class="info-text">日期: {formattedDate}</span>
-          </div>
+          <div class="post-index-label">ARTICLE_LOG</div>
         </div>
-      </header>
 
-      <!-- 文章内容 -->
-      <div class="post-content glass-card">
-        <div class="content-wrapper">
-          <slot />
-        </div>
-      </div>
-
-      <!-- 底部导航 -->
-      <div class="post-footer">
-        <a href="/" class="back-btn glass-card">
-          <span class="btn-icon">&lt;</span>
-          <span class="btn-text">返回首页</span>
-        </a>
-      </div>
-    </article>
-
-    <!-- 侧边栏 -->
-    <aside class="sidebar">
-      <!-- 目录卡片 (可选) -->
-      {headings && headings.length > 0 && (
-        <div class="sidebar-widget glass-card">
-          <div class="widget-title">文章目录</div>
-          <nav class="toc">
-            <ul>
-              {headings.map((heading: any) => (
-                <li class={`toc-item depth-${heading.depth}`}>
-                  <a href={`#${heading.slug}`}>{heading.text}</a>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </div>
-      )}
-
-      <!-- 文章信息卡片 (始终显示) -->
-      <div class="sidebar-widget glass-card">
-        <div class="widget-title">元数据</div>
-        <div class="meta-list">
-          {frontmatter.tags && (
-            <div class="meta-group">
-              <div class="meta-label">标签索引</div>
-              <div class="tags-cloud">
-                {frontmatter.tags.map((tag: string) => (
-                  <span class="tag-chip">{tag}</span>
-                ))}
-              </div>
+        <!-- 内容区域 -->
+        <div class="post-header-content">
+          <div class="header-meta-row">
+            <div class="meta-item">
+              <span class="meta-label">ID</span>
+              <span class="meta-value">#{Math.floor(Math.random() * 9000) + 1000}</span>
             </div>
-          )}
-          <div class="meta-group">
-            <div class="meta-label">预计阅读</div>
-            <div class="read-time">~{Math.ceil((frontmatter.content?.length || 1000) / 500)} 分钟</div>
+            <div class="meta-divider"></div>
+            <div class="meta-item">
+              <span class="meta-label">字数统计</span>
+              <span class="meta-value">{wordCount.toLocaleString()} 字</span>
+            </div>
+            <div class="meta-divider"></div>
+            <div class="meta-item">
+              <span class="meta-label">预计阅读</span>
+              <span class="meta-value">{readingTime} 分钟</span>
+            </div>
+            <div class="meta-divider"></div>
+            <div class="meta-item">
+              <span class="meta-label">状态</span>
+              <span class="meta-value active">数据已同步</span>
+            </div>
+          </div>
+
+          <h1 class="post-title">{frontmatter.title}</h1>
+
+          <div class="post-author-row">
+            <div class="author-info">
+              <span class="info-icon">👤</span>
+              <span class="info-text">{frontmatter.author}</span>
+            </div>
+            <div class="author-info">
+              <span class="info-icon">📅</span>
+              <span class="info-text">{formattedDate}</span>
+            </div>
+            {frontmatter.tags && (
+              <div class="author-info">
+                <span class="info-icon">🏷️</span>
+                <span class="tags-list">
+                  {frontmatter.tags.map((tag: string) => (
+                    <span class="tag-item">{tag}</span>
+                  ))}
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </div>
+      <!-- 边缘装饰交互 -->
+      <div class="header-decoration decoration-tl"></div>
+      <div class="header-decoration decoration-tr"></div>
+    </header>
 
-      <!-- 最新文章卡片 (始终显示) -->
-      <div class="sidebar-widget glass-card">
-        <div class="widget-title">最新传输</div>
-        <ul class="recent-posts">
-          {recentPosts.map((post) => (
-            <li>
-              <a href={post.url} class="recent-link">
-                <span class="recent-title">{post.frontmatter.title}</span>
-                <span class="recent-date">{new Date(post.frontmatter.pubDate).toLocaleDateString()}</span>
+    <div class="layout-grid">
+      <!-- 左侧：空位或预留 -->
+      <aside class="sidebar-left">
+        <!-- 可以在这里放一些次要信息，或者保持留白 -->
+      </aside>
+
+      <!-- 中间：文章主内容 -->
+      <article class="post-container">
+        <!-- 文章内容 -->
+        <div class="post-content glass-card">
+          <div class="content-wrapper">
+            <slot />
+          </div>
+        </div>
+
+        <!-- 底部导航 -->
+        <div class="post-footer">
+          <div class="post-nav">
+            {prevPost ? (
+              <a href={prevPost.url} class="nav-link prev glass-card">
+                <div class="nav-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m15 18-6-6 6-6"></path>
+                  </svg>
+                </div>
+                <div class="nav-content">
+                  <span class="nav-label">PREVIOUS</span>
+                  <span class="nav-text">{prevPost.frontmatter.title}</span>
+                </div>
               </a>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </aside>
+            ) : <div class="nav-placeholder"></div>}
+
+            <a href="/" class="back-home-link glass-card">
+              <div class="back-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m12 19-7-7 7-7"></path>
+                  <path d="M19 12H5"></path>
+                </svg>
+              </div>
+              <div class="back-content">
+                <span class="back-label">RETURN</span>
+                <span class="back-text">返回日志列表</span>
+              </div>
+              <div class="back-decoration"></div>
+            </a>
+
+            {nextPost ? (
+              <a href={nextPost.url} class="nav-link next glass-card">
+                <div class="nav-content">
+                  <span class="nav-label">NEXT</span>
+                  <span class="nav-text">{nextPost.frontmatter.title}</span>
+                </div>
+                <div class="nav-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m9 18 6-6-6-6"></path>
+                  </svg>
+                </div>
+              </a>
+            ) : <div class="nav-placeholder"></div>}
+          </div>
+        </div>
+      </article>
+
+      <!-- 右侧：侧边栏集合 -->
+      <aside class="sidebar-right">
+        <!-- 最新传输 -->
+        <div class="sidebar-widget glass-card">
+          <div class="widget-title">最新传输</div>
+          <ul class="recent-posts">
+            {recentPosts.map((post) => (
+              <li>
+                <a href={post.url} class="recent-link">
+                  <span class="recent-title">{post.frontmatter.title}</span>
+                  <span class="recent-date">{new Date(post.frontmatter.pubDate).toLocaleDateString()}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <!-- 文章目录 (放在最新传输下面) -->
+        {headings && headings.length > 0 && (
+          <div class="sidebar-widget glass-card sticky-widget">
+            <div class="widget-title">文章目录</div>
+            <nav class="toc">
+              <ul>
+                {headings.map((heading: any) => (
+                  <li class={`toc-item depth-${heading.depth}`}>
+                    <a href={`#${heading.slug}`}>{heading.text}</a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </div>
+        )}
+      </aside>
+    </div>
   </div>
+
+  <!-- 返回顶部按钮 -->
+  <button id="back-to-top" class="back-to-top-btn glass-card" aria-label="返回顶部">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="18 15 12 9 6 15"></polyline>
+    </svg>
+  </button>
 </AetherLayout>
 
-<style>
-  .layout-grid {
-    display: grid;
-    grid-template-columns: 1fr 300px;
-    gap: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-    align-items: start;
-  }
+<script>
+  const backToTopBtn = document.getElementById('back-to-top');
+  
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 300) {
+      backToTopBtn?.classList.add('show');
+    } else {
+      backToTopBtn?.classList.remove('show');
+    }
+  });
 
-  /* 主内容区 */
-  .post-container {
+  backToTopBtn?.addEventListener('click', () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  });
+</script>
+
+<style>
+  .post-layout-wrapper {
+    max-width: 95%;
+    margin: 0 auto;
+    padding: 2rem;
     display: flex;
     flex-direction: column;
     gap: 2rem;
-    min-width: 0; /* 防止内容溢出 */
   }
 
-  /* 头部样式 */
-  .post-header {
-    padding: 2.5rem;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
-    position: relative;
-    overflow: hidden;
+  .layout-grid {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 2.5rem;
+    align-items: start;
   }
 
-  .post-header::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    background: linear-gradient(to bottom, var(--color-primary-start), var(--color-primary-end));
+  /* 侧边栏布局 */
+  .sidebar-left {
+    display: none;
   }
 
-  .header-meta {
+  .sidebar-right {
     display: flex;
-    gap: 1.5rem;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  /* 顶部标题卡片 */
+  .post-header {
+    padding: 3rem;
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .post-header:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(6, 182, 212, 0.15);
+    border-color: var(--color-primary-start);
+  }
+
+  .post-card-layout {
+    display: flex;
+    gap: 2.5rem;
+    align-items: center;
+  }
+
+  .post-icon-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    flex-shrink: 0;
+  }
+
+  .stat-icon {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(6, 182, 212, 0.1);
+    border-radius: 16px;
+    color: var(--color-primary-start);
+    border: 1px solid rgba(6, 182, 212, 0.2);
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.1);
+    transition: all 0.3s ease;
+  }
+
+  .post-header:hover .stat-icon {
+    background: rgba(6, 182, 212, 0.2);
+    transform: rotate(5deg) scale(1.1);
+    box-shadow: 0 0 30px rgba(6, 182, 212, 0.3);
+  }
+
+  .post-index-label {
+    font-size: 0.7rem;
+    color: var(--color-neutral);
+    font-family: var(--font-mono),serif;
+    letter-spacing: 0.2em;
+    font-weight: 600;
+  }
+
+  .post-header-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .header-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
     margin-bottom: 1.5rem;
-    font-family: 'Courier New', monospace;
+    font-family: var(--font-mono);
     font-size: 0.85rem;
+    flex-wrap: wrap;
+  }
+
+  .meta-divider {
+    width: 1px;
+    height: 12px;
+    background: var(--color-neutral-light);
+    opacity: 0.5;
   }
 
   .meta-item {
     display: flex;
+    align-items: center;
     gap: 0.5rem;
   }
 
   .meta-label {
-    color: #718096;
+    color: var(--color-neutral);
+    font-size: 0.75rem;
   }
 
   .meta-value {
-    color: #2d3748;
+    color: var(--color-text-title);
     font-weight: 600;
   }
 
   .meta-value.active {
-    color: #38a169;
+    color: #10b981;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .meta-value.active::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: currentColor;
+    border-radius: 50%;
+    box-shadow: 0 0 10px currentColor;
+    animation: pulse 2s infinite;
   }
 
   .post-title {
-    font-size: 2.5rem;
+    font-size: 3rem;
     font-weight: 800;
-    color: #2d3748;
+    color: var(--color-text-title);
     margin: 0 0 1.5rem 0;
-    line-height: 1.2;
-    letter-spacing: -0.02em;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    word-break: break-word;
+    background: linear-gradient(to right, var(--color-text-title), var(--color-primary-start));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 
-  .post-info {
+  .post-author-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 1.5rem;
+    gap: 2rem;
     padding-top: 1.5rem;
-    border-top: 1px dashed #cbd5e0;
+    border-top: 1px dashed var(--color-neutral-light);
   }
 
-  .info-item {
+  .author-info {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    color: #4a5568;
+    gap: 0.6rem;
+    color: var(--color-text-body);
     font-size: 0.95rem;
   }
 
-  .info-icon {
-    opacity: 0.7;
+  .tags-list {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
   }
 
-  /* 内容样式 */
+  .tag-item {
+    background: rgba(6, 182, 212, 0.1);
+    color: var(--color-primary-start);
+    padding: 0.1rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    border: 1px solid rgba(6, 182, 212, 0.2);
+  }
+
+  /* 装饰交互 */
+  .header-decoration {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    pointer-events: none;
+    transition: all 0.3s ease;
+  }
+
+  .decoration-tl {
+    top: -1px;
+    left: -1px;
+    border-top: 3px solid var(--color-primary-start);
+    border-left: 3px solid var(--color-primary-start);
+    border-radius: 8px 0 0 0;
+  }
+
+  .decoration-tr {
+    top: -1px;
+    right: -1px;
+    border-top: 3px solid var(--color-primary-end);
+    border-right: 3px solid var(--color-primary-end);
+    border-radius: 0 8px 0 0;
+  }
+
+  .post-header:hover .header-decoration {
+    width: 60px;
+    height: 60px;
+    opacity: 0.8;
+  }
+
+  /* 侧边栏及组件 */
+  .sticky-widget {
+    position: sticky;
+    top: 2rem;
+  }
+
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  /* 响应式调整 */
+  @media (max-width: 1440px) {
+    .post-layout-wrapper {
+      max-width: 100%;
+      padding: 1.5rem;
+    }
+  }
+
+  @media (max-width: 1280px) {
+    .layout-grid {
+      grid-template-columns: 1fr;
+    }
+    .sidebar-right {
+      display: none;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    .layout-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .sidebar-left, .sidebar-right {
+      display: none;
+    }
+
+    .post-title {
+      font-size: 2.2rem;
+    }
+    
+    .post-card-layout {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.5rem;
+    }
+  }
+
+  @keyframes pulse {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.2); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  /* 保持原有内容样式 */
+  .post-container {
+    min-width: 0;
+  }
+  
   .post-content {
-    padding: 3rem;
-    background: rgba(255, 255, 255, 0.85);
-  }
-
-  .content-wrapper {
-    font-size: 1.1rem;
+    padding: 2.5rem;
     line-height: 1.8;
-    color: var(--color-text-body);
   }
-
-  /* Markdown 内容全局样式 */
+  
   .content-wrapper :global(h2) {
     font-size: 1.8rem;
     margin: 3rem 0 1.5rem;
@@ -254,56 +533,82 @@ const recentPosts = allPosts
     font-weight: 400;
   }
 
-  .content-wrapper :global(p) {
-    margin-bottom: 1.5rem;
-    text-align: justify;
-  }
-
   .content-wrapper :global(ul), 
   .content-wrapper :global(ol) {
     margin-bottom: 1.5rem;
-    padding-left: 1.5rem;
+    padding-left: 0;
+    list-style: none;
   }
 
   .content-wrapper :global(li) {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
     position: relative;
+    padding-left: 1.75rem;
+    color: var(--color-text-body);
+    line-height: 1.7;
   }
 
-  .content-wrapper :global(ul li)::marker {
+  /* 无序列表样式 */
+  .content-wrapper :global(ul > li)::before {
+    content: '';
+    position: absolute;
+    left: 0.5rem;
+    top: 0.7rem;
+    width: 6px;
+    height: 6px;
+    background: var(--color-primary-start);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--color-primary-start);
+  }
+
+  /* 有序列表样式 */
+  .content-wrapper :global(ol) {
+    counter-reset: list-counter;
+  }
+
+  .content-wrapper :global(ol > li) {
+    counter-increment: list-counter;
+  }
+
+  .content-wrapper :global(ol > li)::before {
+    content: counter(list-counter);
+    position: absolute;
+    left: 0;
+    top: 0.2rem;
+    width: 1.2rem;
+    height: 1.2rem;
+    background: rgba(6, 182, 212, 0.1);
     color: var(--color-primary-start);
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    border: 1px solid rgba(6, 182, 212, 0.2);
   }
 
-  .content-wrapper :global(blockquote) {
-    margin: 2.5rem 0;
-    padding: 1.5rem 2rem;
-    background: rgba(248, 250, 252, 0.8);
-    border-left: 4px solid var(--color-primary-start);
-    border-radius: 0 8px 8px 0;
-    color: var(--color-neutral-dark);
-    font-style: normal;
-    position: relative;
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.02);
+  /* 处理嵌套列表 */
+  .content-wrapper :global(li ul),
+  .content-wrapper :global(li ol) {
+    margin-top: 0.75rem;
+    margin-bottom: 0.5rem;
   }
 
-  .content-wrapper :global(blockquote p) {
-    margin-bottom: 0;
-  }
 
   /* 代码块增强样式 */
   .content-wrapper :global(pre) {
-    background: #0d1117; /* 更深邃的背景 */
+    background: #0d1117;
     color: #e6edf3;
     padding: 2.5rem 1.5rem 1.5rem;
     border-radius: 12px;
     overflow-x: auto;
     margin: 2.5rem 0;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     position: relative;
   }
 
-  /* 模拟 macOS 窗口按钮 */
   .content-wrapper :global(pre)::before {
     content: '';
     position: absolute;
@@ -317,12 +622,6 @@ const recentPosts = allPosts
     z-index: 1;
   }
 
-  .content-wrapper :global(code) {
-    font-family: var(--font-mono);
-    font-size: 0.95em;
-  }
-
-  /* 行内代码块 */
   .content-wrapper :global(p > code) {
     background: rgba(59, 130, 246, 0.1);
     color: var(--color-text-code);
@@ -330,32 +629,9 @@ const recentPosts = allPosts
     border-radius: 6px;
     font-size: 0.9em;
     border: 1px solid rgba(59, 130, 246, 0.2);
-    font-weight: 500;
   }
 
-  .content-wrapper :global(img) {
-    max-width: 100%;
-    height: auto;
-    border-radius: 12px;
-    margin: 2.5rem 0;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(0,0,0,0.05);
-  }
-
-  .content-wrapper :global(a) {
-    color: var(--color-primary-start);
-    text-decoration: none;
-    background-image: linear-gradient(transparent 90%, var(--color-primary-start) 10%);
-    background-repeat: no-repeat;
-    background-size: 0% 100%;
-    transition: background-size 0.3s;
-  }
-
-  .content-wrapper :global(a:hover) {
-    background-size: 100% 100%;
-  }
-
-  /* 表格样式增强 */
+  /* 表格样式 */
   .content-wrapper :global(table) {
     width: 100%;
     border-collapse: collapse;
@@ -381,42 +657,236 @@ const recentPosts = allPosts
     color: var(--color-text-body);
   }
 
-  .content-wrapper :global(tr:last-child td) {
-    border-bottom: none;
-  }
-
   .content-wrapper :global(tr:hover td) {
     background-color: #f8fafc;
   }
 
-  /* 侧边栏样式 */
-  .sidebar {
+  /* 返回顶部按钮样式 */
+  .back-to-top-btn {
+    position: fixed;
+    bottom: 4rem;
+    right: 30rem;
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
     display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+    align-items: center;
+    justify-content: center;
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    color: var(--color-primary-start);
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 9999;
+    border: 1px solid var(--color-primary-start);
+    box-shadow: 0 8px 32px rgba(6, 182, 212, 0.2);
+  }
+
+  .back-to-top-btn.show {
+    opacity: 0.4;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .back-to-top-btn:hover {
+    background: var(--color-primary-start);
+    color: white;
+    transform: translateY(-8px) scale(1.1);
+    box-shadow: 0 15px 30px rgba(6, 182, 212, 0.4);
+    border-color: transparent;
+  }
+
+  .back-to-top-btn svg {
+    width: 28px;
+    height: 28px;
+    transition: transform 0.3s ease;
+  }
+
+  .back-to-top-btn:hover svg {
+    transform: translateY(-2px);
+  }
+
+  /* 修复遮盖情况 */
+  .sticky-widget {
     position: sticky;
     top: 2rem;
+    z-index: 10;
+  }
+
+  .sidebar-widget {
+    z-index: 5;
+  }
+  
+  .post-footer {
+    margin-top: 5rem;
+    padding-top: 3rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .post-nav {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 1.5rem;
+    align-items: stretch;
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    min-width: 0;
+  }
+
+  .nav-placeholder {
+    visibility: hidden;
+  }
+
+  .nav-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+  }
+
+  .nav-label {
+    font-size: 0.6rem;
+    font-family: var(--font-mono);
+    color: var(--color-neutral);
+    letter-spacing: 0.1em;
+  }
+
+  .nav-text {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text-title);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .nav-icon {
+    color: var(--color-primary-start);
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+  }
+
+  .nav-link:hover {
+    border-color: var(--color-primary-start);
+    background: rgba(6, 182, 212, 0.05);
+    transform: translateY(-2px);
+  }
+
+  .nav-link.prev:hover .nav-icon {
+    transform: translateX(-5px);
+  }
+
+  .nav-link.next:hover .nav-icon {
+    transform: translateX(5px);
+  }
+
+  .nav-link.next {
+    text-align: right;
+    justify-content: flex-end;
+  }
+
+  .back-home-link {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1rem 2rem;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    white-space: nowrap;
+  }
+
+  @media (max-width: 1024px) {
+    .post-nav {
+      grid-template-columns: 1fr;
+    }
+    .back-home-link {
+      order: -1;
+    }
+  }
+  
+  .back-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(6, 182, 212, 0.1);
+    border-radius: 10px;
+    color: var(--color-primary-start);
+    transition: all 0.3s ease;
+  }
+
+  .back-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .back-label {
+    font-size: 0.65rem;
+    font-family: var(--font-mono);
+    color: var(--color-neutral);
+    letter-spacing: 0.15em;
+    font-weight: 700;
+  }
+
+  .back-text {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text-title);
+  }
+
+  .back-decoration {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background: linear-gradient(to right, var(--color-primary-start), var(--color-primary-end));
+    transition: width 0.4s ease;
+  }
+  
+  .back-home-link:hover {
+    transform: translateX(-10px);
+    border-color: var(--color-primary-start);
+    box-shadow: 0 15px 30px rgba(6, 182, 212, 0.15);
+  }
+
+  .back-home-link:hover .back-icon {
+    background: var(--color-primary-start);
+    color: white;
+    transform: scale(1.1);
+  }
+
+  .back-home-link:hover .back-decoration {
+    width: 100%;
   }
 
   .sidebar-widget {
     padding: 1.5rem;
-    transition: transform 0.3s ease;
-  }
-
-  .sidebar-widget:hover {
-    transform: translateX(-5px);
   }
 
   .widget-title {
     font-size: 0.9rem;
     font-weight: 700;
-    color: var(--color-text-title);
-    margin-bottom: 1.25rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px dashed var(--color-neutral-light);
-    font-family: var(--font-mono);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.1em;
+    margin-bottom: 1.25rem;
+    color: var(--color-neutral-dark);
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -425,12 +895,11 @@ const recentPosts = allPosts
   .widget-title::before {
     content: '';
     width: 4px;
-    height: 12px;
+    height: 16px;
     background: var(--color-primary-start);
     border-radius: 2px;
   }
 
-  /* 目录 */
   .toc ul {
     list-style: none;
     padding: 0;
@@ -438,181 +907,53 @@ const recentPosts = allPosts
   }
 
   .toc-item {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .toc-item.depth-3 {
+    padding-left: 1rem;
+    font-size: 0.9em;
+    opacity: 0.8;
   }
 
   .toc-item a {
     text-decoration: none;
-    color: #718096;
-    font-size: 0.9rem;
-    transition: color 0.2s;
+    color: var(--color-text-body);
+    transition: all 0.2s;
     display: block;
     line-height: 1.4;
   }
 
   .toc-item a:hover {
-    color: #3182ce;
+    color: var(--color-primary-start);
+    transform: translateX(3px);
   }
 
-  .toc-item.depth-3 {
-    padding-left: 1rem;
-    font-size: 0.85rem;
-  }
-
-  /* 元数据 */
-  .meta-group {
-    margin-bottom: 1rem;
-  }
-
-  .meta-label {
-    font-size: 0.8rem;
-    color: #a0aec0;
-    margin-bottom: 0.5rem;
-    text-transform: uppercase;
-  }
-
-  .tags-cloud {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .tag-chip {
-    background: rgba(59, 130, 246, 0.05);
-    color: var(--color-text-body);
-    padding: 0.2rem 0.6rem;
-    border-radius: 6px;
-    font-size: 0.8rem;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 1px solid rgba(59, 130, 246, 0.1);
-    font-family: var(--font-mono);
-  }
-
-  .tag-chip:hover {
-    background: var(--color-primary-start);
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(6, 182, 212, 0.2);
-    border-color: transparent;
-  }
-
-  .read-time {
-    color: #4a5568;
-    font-size: 0.9rem;
-  }
-
-  /* 最新文章 */
   .recent-posts {
     list-style: none;
     padding: 0;
     margin: 0;
-  }
-
-  .recent-posts li {
-    margin-bottom: 1rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #f7fafc;
-  }
-
-  .recent-posts li:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-    padding-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
   }
 
   .recent-link {
     text-decoration: none;
-    display: block;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
   }
 
   .recent-title {
-    display: block;
-    color: #4a5568;
     font-size: 0.95rem;
-    margin-bottom: 0.3rem;
-    transition: color 0.2s;
-  }
-
-  .recent-link:hover .recent-title {
-    color: #3182ce;
+    color: var(--color-text-title);
+    font-weight: 600;
+    line-height: 1.3;
   }
 
   .recent-date {
-    display: block;
     font-size: 0.8rem;
-    color: #a0aec0;
-  }
-
-  /* 底部导航 */
-  .post-footer {
-    display: flex;
-    justify-content: center;
-    margin-top: 2rem;
-    margin-bottom: 4rem;
-  }
-
-  .back-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    padding: 0.8rem 2rem;
-    background: white;
-    text-decoration: none;
-    border-radius: 50px;
-    transition: all 0.3s ease;
-    border: 1px solid #e2e8f0;
-  }
-
-  .back-btn:hover {
-    transform: translateX(-5px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    border-color: #3182ce;
-  }
-
-  .btn-icon {
-    color: #3182ce;
-    font-weight: bold;
-  }
-
-  .btn-text {
-    color: #4a5568;
-    font-weight: 600;
-  }
-
-  /* 响应式调整 */
-  @media (max-width: 1024px) {
-    .layout-grid {
-      grid-template-columns: 1fr;
-      max-width: 800px;
-    }
-
-    .sidebar {
-      display: flex; /* 强制显示侧边栏，改为放置在底部或调整布局 */
-      flex-direction: row;
-      flex-wrap: wrap;
-      position: static;
-    }
-    
-    .sidebar-widget {
-      flex: 1 1 300px;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .post-header {
-      padding: 1.5rem;
-    }
-
-    .post-title {
-      font-size: 1.8rem;
-    }
-
-    .post-content {
-      padding: 1.5rem;
-    }
-    
-    .sidebar {
-      flex-direction: column;
-    }
+    color: var(--color-neutral);
   }
 </style>

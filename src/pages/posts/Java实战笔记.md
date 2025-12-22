@@ -10,84 +10,15 @@ tags:
   - "实战"
 ---
 
-## 1. Stream 流操作
+## 1. 函数式编程：Stream 与 Optional
 
-Java 8 引入的 Stream API 极大地简化了集合操作。
+Java 8+ 带来的函数式编程极大地提升了代码的简洁性与可读性。关于这两者的详细 API 列表、复杂数据转换（如多级分组、扁平化）以及生产环境下的联动实战，请参考专项笔记：
 
-### 常用操作示例
+👉 **[Java 高阶编程：Stream 与 Optional 实战](./Java高阶编程：Stream与Optional实战)**
 
-```java
-import java.util.*;
-import java.util.stream.Collectors;
+---
 
-public class StreamDemo {
-    public static void main(String[] args) {
-        List<User> users = Arrays.asList(
-            new User(1, "张三", 20, "北京"),
-            new User(2, "李四", 25, "上海"),
-            new User(3, "王五", 20, "北京"),
-            new User(4, "赵六", 30, "深圳")
-        );
-
-        // 1. 过滤 (Filter): 筛选年龄大于 22 的用户
-        List<User> oldUsers = users.stream()
-            .filter(u -> u.getAge() > 22)
-            .collect(Collectors.toList());
-
-        // 2. 映射 (Map): 提取所有用户的名字
-        List<String> names = users.stream()
-            .map(User::getName)
-            .collect(Collectors.toList());
-
-        // 3. 分组 (GroupingBy): 按城市分组
-        Map<String, List<User>> byCity = users.stream()
-            .collect(Collectors.groupingBy(User::getCity));
-
-        // 4. 排序 (Sorted): 按年龄倒序
-        List<User> sortedUsers = users.stream()
-            .sorted(Comparator.comparing(User::getAge).reversed())
-            .collect(Collectors.toList());
-
-        // 5. 聚合 (Reduce): 计算年龄总和
-        int totalAge = users.stream()
-            .mapToInt(User::getAge)
-            .sum();
-            
-        System.out.println("总年龄: " + totalAge);
-    }
-}
-```
-
-## 2. Optional 的用法
-
-Optional 用于优雅地处理可能为 `null` 的值，避免 `NullPointerException`。
-
-```java
-import java.util.Optional;
-
-public class OptionalDemo {
-    public void processUser(User user) {
-        // 1. 创建 Optional (允许为 null)
-        Optional<User> optUser = Optional.ofNullable(user);
-
-        // 2. 如果存在则执行 (ifPresent)
-        optUser.ifPresent(u -> System.out.println("用户存在: " + u.getName()));
-
-        // 3. 获取值，如果为空则提供默认值 (orElse)
-        User safeUser = optUser.orElse(new User(0, "未知用户", 0, "未知"));
-
-        // 4. 获取值，如果为空则抛出异常 (orElseThrow)
-        // User requiredUser = optUser.orElseThrow(() -> new RuntimeException("用户不能为空"));
-
-        // 5. 链式处理 (Map): 安全获取城市名称，如果 user 为 null 或 city 为 null，返回 "未知城市"
-        String city = optUser
-            .map(User::getCity)
-            .orElse("未知城市");
-    }
-}
-```
-
-## 3. 线程池 (ThreadPool)
+## 2. 线程池 (ThreadPool)
 
 推荐手动创建线程池以更好地控制资源，但也需要了解常见的预设线程池。
 
@@ -310,45 +241,13 @@ try (PDDocument document = PDDocument.load(new File("demo.pdf"))) {
 }
 ```
 
-## 6. Maven 常用操作
+## 6. Maven 构建管理
 
-### 6.1 常用命令
+Maven 是 Java 项目最常用的构建与管理工具。关于 Maven 的详细命令、生命周期、POM 标签以及多环境打包等实战场景，请参考专项笔记：
 
-| 命令 | 描述 |
-| :--- | :--- |
-| `mvn clean` | 清理项目，删除 target 目录 |
-| `mvn compile` | 编译源代码 |
-| `mvn test` | 运行测试 |
-| `mvn package` | 打包项目 (生成 jar 或 war) |
-| `mvn install` | 安装包到本地仓库 |
-| `mvn deploy` | 部署包到远程仓库 |
-| `mvn dependency:tree` | 查看依赖树 (排查冲突神器) |
+👉 **[Maven 实战详解](./Maven实战详解)**
 
-### 6.2 依赖管理技巧
-
-**排除依赖 (Exclusions)**
-
-当出现依赖冲突（如引入了不同版本的 logging 库）时，可以使用 `<exclusions>` 排除不需要的传递依赖。
-
-```xml
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-web</artifactId>
-    <exclusions>
-        <exclusion>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-tomcat</artifactId>
-        </exclusion>
-    </exclusions>
-</dependency>
-```
-
-**依赖范围 (Scope)**
-
-*   **compile** (默认): 编译、测试、运行都有效。
-*   **provided**: 编译、测试有效，运行时由容器提供 (如 Servlet API)。
-*   **runtime**: 测试、运行有效，编译无效 (如 JDBC 驱动)。
-*   **test**: 仅测试有效 (如 JUnit)。
+---
 
 ## 7. Spring Boot SSE (Server-Sent Events)
 
