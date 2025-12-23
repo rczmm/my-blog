@@ -241,3 +241,67 @@ for (int startIndex = 0; startIndex < cardNosChangeQuery.size(); startIndex += 1
 ```
 
 > **总结**：生产环境排查 OOM 时，如果工具链受限，**JDK 原生命令 + MAT 离线分析** 是最稳妥的组合拳。同时要警惕任何“在循环中不断追加数据到集合”的代码逻辑。
+
+---
+
+## 5. 进阶实战：G1 GC 风暴引发的“JVM 假死”排查
+
+### 5.1 故障背景
+- **现象**：CPU 再次拉满，Nacos 节点频繁掉线。
+- **初查**：执行 `top -Hp 1436513`，发现消耗 CPU 的并非业务线程，而是 **13 条 GC Thread**，它们几乎吃掉了 **96% 的 CPU**。
+- **系统状态**：VM 占用 26.8 GB，常驻内存 18.5 GB，系统 Load 飙升至 17+。
+- **初步判断**：这是典型的 **G1 GC 风暴**。
+
+### 5.2 排查过程
+
+#### 第一阶段：确认 GC 状态
+执行 `jstat -gc -t 1436513 1s 5` 观察堆内存动态：
+- **发现**：Old 区（OC）16 GB，已使用（OU）几乎也是 16 GB（占满 100%）。
+- **发现**：Eden 区仅剩 16 MB 且占用率为 0，说明 JVM 根本不敢分配新对象，一分配就触发 GC。
+- **指标**：FGC 次数在 5 秒内从 105 增加到 106；GCT（GC总耗时）已达 737s，占 JVM 生命期的 12%。
+- **结论**：S0/S1 为 0，进入 G1 的 **“fully-old” 模式**：年轻代对象被迅速晋升，堆内存已完全被老年代占满，内存泄漏进入晚期。
+
+#### 第二阶段：遭遇“JVM 假死”
+尝试执行 `jmap -histo:live 1436513` 进一步排查：
+- **结果**：`Exception in thread "main" com.sun.tools.attach.AttachNotSupportedException: target process doesn't respond within 10500ms`
+- **原因**：JVM 已经卡死在 **安全点 (Safepoint)**。GC 线程占着 CPU 却无法完成 STW（Stop The World），导致 Attach 机制彻底失效。这即是 **“JVM 假死”** 状态。
+
+#### 第三阶段：绕过 Attach 探测参数
+由于 `jmap` 失效，尝试使用相对轻量的 `jcmd 1436513 VM.flags`（有时在卡死边缘仍能获取信息）：
+- **MaxHeapSize** ≈ 16 GB（证实了堆已达上限）。
+- **InitialHeapSize** 仅 1 GB（说明启动时堆很小，后期扩容至 16 GB 后无路可走）。
+- **G1RegionSize** = 8 MB。
+
+#### 第四阶段：OS 级兜底方案 (gcore)
+在线调试命令全部失效，必须采取 **OS 级强制 Dump**：
+```bash
+# 使用 gcore 强制拍下进程镜像（不经过 JVM 配合）
+gcore -o /tmp/java.core 1436513
+```
+- **插曲**：提示 `设备上没有空间`。
+- **解决**：执行 `df -h` 寻找大分区，切换到足够空间的目录下重新执行。
+
+#### 第五阶段：离线分析的“坑” (jhsdb Bug)
+拿到 `java.core` 后，尝试用 `jmap` 离线解析：
+```bash
+jmap -histo /usr/lib/jvm/java-11-openjdk/bin/java /tmp/java.core.1436513
+```
+- **报错**：`java.lang.IndexOutOfBoundsException: bad SID 0`。
+- **诊断**：这是 **JDK 17 的 jhsdb 工具** 在解析特定 Core 文件时的内部 Bug。
+
+#### 第六阶段：最终突围
+由于 Core 文件解析失败，只能回头继续疯狂重试在线 Attach（寄希望于 GC 间隙的短暂释放）：
+```bash
+# 经过数十次尝试，终于在某次 GC 间隙成功挂载
+jmap -dump:live,format=b,file=/home/leak.hprof 1436513
+
+# 拿到文件后立即压缩，节约传输时间
+gzip -c /home/leak.hprof > /home/leak.hprof.gz
+```
+
+### 5.3 经验总结：当 JVM 假死时怎么办？
+1.  **不要只盯着 jmap**：当 `AttachNotSupportedException` 出现时，说明 JVM 已失去响应。
+2.  **善用 gcore**：它是 OS 层的工具，不需要 JVM 响应，是最后的保底手段。
+3.  **注意磁盘空间**：Dump 文件和 Core 文件的大小通常等同于堆内存大小，导出前必看 `df -h`。
+4.  **JDK 版本兼容性**：JDK 17 等高版本在处理 `jhsdb` 时可能存在 Bug，必要时可尝试在不同版本的 JDK 环境下解析。
+5.  **持久战**：在线命令失效时，除了 gcore，也可以通过脚本循环尝试 `jmap -dump`，有时能抓到 GC 释放的极短瞬间。
