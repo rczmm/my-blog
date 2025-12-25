@@ -1,0 +1,78 @@
+---
+interface Props {
+  percent?: number;
+  size?: number;
+  strokeWidth?: number;
+}
+
+const { 
+  percent = 75, 
+  size = 100, 
+  strokeWidth = 8 
+} = Astro.props;
+
+const radius = (size / 2) - strokeWidth;
+const center = size / 2;
+const circumference = 2 * Math.PI * radius;
+const offset = circumference - (percent / 100) * circumference;
+---
+
+<div class="circular-progress-preview">
+  <svg width={size} height={size}>
+    <circle
+      class="bg"
+      cx={center}
+      cy={center}
+      r={radius}
+      stroke-width={strokeWidth}
+    />
+    <circle
+      class="progress"
+      cx={center}
+      cy={center}
+      r={radius}
+      stroke-width={strokeWidth}
+      stroke-dasharray={circumference}
+      stroke-dashoffset={offset}
+    />
+    <text x={center} y={center} text-anchor="middle" dominant-baseline="middle" class="text">
+      {percent}%
+    </text>
+  </svg>
+</div>
+
+<style>
+  .circular-progress-preview {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  svg {
+    transform: rotate(-90deg);
+  }
+
+  circle {
+    fill: none;
+    stroke-linecap: round;
+  }
+
+  .bg {
+    stroke: rgba(255, 255, 255, 0.05);
+  }
+
+  .progress {
+    stroke: var(--color-primary-start);
+    filter: drop-shadow(0 0 5px var(--color-primary-start));
+    transition: stroke-dashoffset 1s ease-out;
+  }
+
+  .text {
+    fill: var(--color-text-title);
+    font-size: 1.2rem;
+    font-weight: 800;
+    font-family: var(--font-mono);
+    transform: rotate(90deg);
+    transform-origin: center;
+  }
+</style>

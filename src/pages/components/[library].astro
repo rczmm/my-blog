@@ -1,0 +1,815 @@
+---
+import AetherLayout from '../../layouts/AetherLayout.astro';
+import { componentLibraries } from '../../data/components';
+import { getCollection, getEntry } from 'astro:content';
+import ComponentRenderer from '../../components/ComponentRenderer.astro';
+import { Code } from 'astro:components';
+
+// 自动读取组件源码
+const rawComponents = import.meta.glob('../../components/lib/*.astro', { as: 'raw', eager: true });
+
+export async function getStaticPaths() {
+  return componentLibraries.map((lib) => ({
+    params: { library: lib.id },
+    props: { library: lib },
+  }));
+}
+
+const { library } = Astro.props;
+const title = `${library.name} - 组件库检索`;
+
+// 建立 ID 到源码的映射
+const sourceMap: Record<string, string> = {};
+Object.entries(rawComponents).forEach(([path, content]) => {
+  const fileName = path.split('/').pop()?.replace('.astro', '');
+  if (fileName) {
+    // 简单的 ID 匹配逻辑：GlassCard -> glass-card
+    const id = fileName.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+    sourceMap[id] = content;
+  }
+});
+
+// 获取所有相关的组件内容
+const componentContents = await Promise.all(
+  library.components.map(async (comp) => {
+    const entry = await getEntry('components', comp.id);
+    if (entry) {
+      const { Content } = await entry.render();
+      return { id: comp.id, Content, data: entry.data };
+    }
+    return { id: comp.id, Content: null, data: null };
+  })
+);
+
+const contentMap = Object.fromEntries(componentContents.map(c => [c.id, c]));
+---
+
+<AetherLayout title={title}>
+  <div class="library-container">
+    <!-- 顶部导航指示 -->
+    <div class="terminal-nav glass-card">
+      <span class="path">> SYSTEM / CORE / COMPONENTS / <span class="current">{library.id.toUpperCase()}</span></span>
+      <span class="cursor">_</span>
+      <a href="/components" class="back-link">&laquo; 返回索引</a>
+    </div>
+
+    <header class="library-header glass-card">
+      <div class="header-main">
+        <div class="icon-badge">
+          <span class="lib-icon">{library.icon}</span>
+        </div>
+        <div class="lib-info">
+          <h1 class="lib-title">{library.name}</h1>
+          <p class="lib-desc">{library.description}</p>
+        </div>
+      </div>
+      <div class="header-stats">
+        <div class="stat-item">
+          <span class="label">组件配额</span>
+          <span class="value">{library.components.length}</span>
+        </div>
+        <div class="stat-item">
+          <span class="label">状态</span>
+          <span class="value status-active">ACTIVE</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="components-stack">
+      {library.components.map((comp, index) => {
+        const componentContent = contentMap[comp.id];
+        const { Content, data } = componentContent || {};
+        const displayName = data?.name || comp.name;
+        const displayDescription = data?.description || comp.description;
+        const displayUsage = data?.usage || comp.usage;
+        const sourceCode = sourceMap[comp.id];
+
+        return (
+          <section class="component-section" id={comp.id}>
+            <div class="section-header">
+              <h2 class="component-title">
+                <span class="title-index">0{index + 1}.</span> {displayName}
+              </h2>
+              <p class="component-intro">{displayDescription}</p>
+            </div>
+
+            <div class="example-container">
+              <!-- 预览区域 -->
+              <div class="example-preview">
+                <ComponentRenderer id={comp.id} />
+              </div>
+
+              <!-- 操作栏 -->
+              <div class="example-toolbar">
+                <button class="tool-btn copy-code" title="复制代码" data-code={sourceCode}>
+                  <span class="btn-icon">📋</span>
+                </button>
+                <button class="tool-btn toggle-code" title="查看源码">
+                  <span class="btn-icon">{'</>'}</span>
+                </button>
+              </div>
+
+              <!-- 源码区域 (折叠) -->
+              <div class="example-source">
+                {sourceCode ? (
+                  <Code code={sourceCode} lang="astro" theme="github-dark" />
+                ) : (
+                  <div class="no-source">SOURCE_NOT_FOUND</div>
+                )}
+                <div class="collapse-footer">
+                  <button class="footer-toggle-btn">
+                    <span class="arrow">▲</span> 收起代码
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="doc-content">
+              {Content && (
+                <div class="markdown-content">
+                  <Content />
+                </div>
+              )}
+
+              {data?.props && data.props.length > 0 && (
+                <div class="props-table-wrapper">
+                  <h3 class="props-title">Attributes</h3>
+                  <table class="props-table">
+                    <thead>
+                      <tr>
+                        <th>参数</th>
+                        <th>说明</th>
+                        <th>类型</th>
+                        <th>默认值</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data.props.map((prop: any) => (
+                        <tr>
+                          <td class="prop-name">{prop.name}</td>
+                          <td class="prop-desc">{prop.description}</td>
+                          <td class="prop-type">`{prop.type}`</td>
+                          <td class="prop-default">{prop.default || '-'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </section>
+        );
+      })}
+    </div>
+  </div>
+</AetherLayout>
+
+<style>
+  .library-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .terminal-nav {
+    padding: 0.75rem 1.5rem;
+    margin-bottom: 2rem;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--color-primary-start);
+    border: 1px dashed var(--color-primary-start);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .current {
+    color: var(--color-text-title);
+    font-weight: 600;
+  }
+
+  .cursor {
+    animation: blink 1s infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .back-link {
+    margin-left: auto;
+    color: var(--color-neutral);
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .back-link:hover {
+    color: var(--color-primary-start);
+  }
+
+  .library-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .header-main {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .icon-badge {
+    width: 80px;
+    height: 80px;
+    background: rgba(6, 182, 212, 0.05);
+    border: 1px solid rgba(6, 182, 212, 0.1);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+  }
+
+  .lib-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--color-text-title);
+    margin: 0 0 0.5rem 0;
+  }
+
+  .lib-desc {
+    font-size: 0.95rem;
+    color: var(--color-text-body);
+    opacity: 0.7;
+    max-width: 500px;
+  }
+
+  .header-stats {
+    display: flex;
+    gap: 2rem;
+    padding-left: 2rem;
+    border-left: 1px solid var(--glass-border);
+  }
+
+  .stat-item {
+    text-align: right;
+  }
+
+  .stat-item .label {
+    display: block;
+    font-size: 0.7rem;
+    font-family: var(--font-mono);
+    color: var(--color-neutral);
+    margin-bottom: 0.25rem;
+  }
+
+  .stat-item .value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--color-primary-start);
+    font-family: var(--font-mono);
+  }
+
+  .status-active {
+    color: #27c93f !important;
+    text-shadow: 0 0 5px rgba(39, 201, 63, 0.5);
+  }
+
+  .components-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 5rem;
+  }
+
+  /* ElementPlus 风格预览卡片 */
+  .component-section {
+    margin-bottom: 4rem;
+  }
+
+  .section-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .component-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text-title);
+    margin: 0 0 0.5rem 0;
+  }
+
+  .title-index {
+    color: var(--color-primary-start);
+    opacity: 0.5;
+    margin-right: 0.5rem;
+  }
+
+  .component-intro {
+    font-size: 0.95rem;
+    color: var(--color-text-body);
+    opacity: 0.7;
+  }
+
+  .example-container {
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    background: var(--glass-bg);
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .example-container:hover {
+    border-color: rgba(6, 182, 212, 0.3);
+  }
+
+  .example-preview {
+    padding: 3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+    position: relative;
+    overflow: hidden;
+    background: transparent;
+  }
+
+  /* 移除之前的背景相关伪元素 */
+  .example-preview::before {
+    display: none;
+  }
+
+  .example-toolbar {
+    padding: 0.5rem 1rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    border-top: 1px solid var(--glass-border);
+    border-bottom: 1px solid transparent;
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .tool-btn {
+    background: none;
+    border: none;
+    color: var(--color-neutral);
+    cursor: pointer;
+    padding: 0.4rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    opacity: 0.6;
+  }
+
+  .tool-btn:hover {
+    color: var(--color-primary-start);
+    background: rgba(6, 182, 212, 0.1);
+    opacity: 1;
+  }
+
+  .example-source {
+    display: none;
+    border-top: 1px solid var(--glass-border);
+    background: #0d0d17;
+  }
+
+  .example-source.active {
+    display: block;
+  }
+
+  .example-source :global(pre) {
+    margin: 0 !important;
+    padding: 1.5rem !important;
+    background: transparent !important;
+    font-size: 0.85rem !important;
+  }
+
+  .collapse-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    justify-content: center;
+  }
+
+  .footer-toggle-btn {
+    width: 100%;
+    padding: 0.75rem;
+    background: none;
+    border: none;
+    color: var(--color-neutral);
+    font-size: 0.8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+  }
+
+  .footer-toggle-btn:hover {
+    color: var(--color-primary-start);
+    background: rgba(6, 182, 212, 0.05);
+  }
+
+  .footer-toggle-btn .arrow {
+    font-size: 0.6rem;
+    transition: transform 0.3s ease;
+  }
+
+  /* 文档内容样式 */
+  .doc-content {
+    margin-top: 2rem;
+  }
+
+  .markdown-content {
+    font-size: 0.9rem;
+    color: var(--color-text-body);
+    line-height: 1.6;
+    opacity: 0.9;
+  }
+
+  .markdown-content :global(h3) {
+    font-size: 1rem;
+    color: var(--color-primary-start);
+    margin: 1.5rem 0 0.75rem 0;
+    font-family: var(--font-mono);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .markdown-content :global(h3::before) {
+    content: '>';
+    opacity: 0.5;
+  }
+
+  .markdown-content :global(ul) {
+    padding-left: 1.2rem;
+    margin: 0.75rem 0;
+    list-style-type: none;
+  }
+
+  .markdown-content :global(li) {
+    position: relative;
+    margin-bottom: 0.4rem;
+  }
+
+  .markdown-content :global(li::before) {
+    content: '●';
+    position: absolute;
+    left: -1.2rem;
+    color: var(--color-primary-start);
+    font-size: 0.6rem;
+    top: 0.5rem;
+    opacity: 0.6;
+  }
+
+  .markdown-content :global(code) {
+    font-family: var(--font-mono);
+    background: rgba(6, 182, 212, 0.1);
+    color: var(--color-primary-start);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+  }
+
+  .markdown-content :global(pre) {
+    background: rgba(13, 13, 23, 0.5) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    padding: 1rem !important;
+    margin: 1rem 0;
+  }
+
+  .markdown-content :global(pre code) {
+    background: transparent;
+    padding: 0;
+    color: inherit;
+  }
+
+  .markdown-content :global(p) {
+    margin: 0.75rem 0;
+  }
+
+  /* 参数表格样式 */
+  .props-table-wrapper {
+    margin-top: 2rem;
+  }
+
+  .props-title {
+    font-size: 1rem;
+    color: var(--color-primary-start);
+    font-family: var(--font-mono);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .props-title::before {
+    content: '[';
+    opacity: 0.5;
+  }
+  .props-title::after {
+    content: ']';
+    opacity: 0.5;
+  }
+
+  .props-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    color: var(--color-text-body);
+    border: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .props-table th {
+    text-align: left;
+    padding: 0.75rem 1rem;
+    background: rgba(6, 182, 212, 0.05);
+    color: var(--color-primary-start);
+    font-family: var(--font-mono);
+    border-bottom: 1px solid var(--glass-border);
+  }
+
+  .props-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .prop-name {
+    font-family: var(--font-mono);
+    color: var(--color-text-title);
+    font-weight: 600;
+  }
+
+  .prop-type {
+    color: var(--color-primary-start);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+  }
+
+  .prop-default {
+    font-family: var(--font-mono);
+    opacity: 0.6;
+  }
+
+  .prop-desc {
+    opacity: 0.8;
+  }
+
+  .preview-terminal {
+    background: #0d0d17;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .terminal-header {
+    background: rgba(255,255,255,0.03);
+    padding: 0.6rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .terminal-dots {
+    display: flex;
+    gap: 6px;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .red { background: #ff5f56; }
+  .yellow { background: #ffbd2e; }
+  .green { background: #27c93f; }
+
+  .terminal-title {
+    font-size: 0.7rem;
+    font-family: var(--font-mono);
+    color: rgba(255,255,255,0.3);
+  }
+
+  .terminal-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-right: auto;
+    margin-left: 2rem;
+  }
+
+  .tab-btn {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.3);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    cursor: pointer;
+    padding: 0.2rem 0;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+  }
+
+  .tab-btn:hover {
+    color: rgba(255,255,255,0.6);
+  }
+
+  .tab-btn.active {
+    color: var(--color-primary-start);
+    border-bottom-color: var(--color-primary-start);
+  }
+
+  .terminal-body {
+    min-height: 250px;
+    position: relative;
+    background: #0d0d17;
+  }
+
+  .mode-content {
+    display: none;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+  }
+
+  .mode-content.active {
+    display: block;
+  }
+
+  .preview-mode {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at center, #1a1a2e 0%, #0d0d17 100%);
+    min-height: 250px;
+  }
+
+  .preview-mode.active {
+    display: flex;
+  }
+
+  .code-mode {
+    padding: 0;
+    max-height: 400px;
+  }
+
+  .code-mode :global(pre) {
+    margin: 0 !important;
+    padding: 1.5rem !important;
+    background: transparent !important;
+    font-size: 0.85rem !important;
+  }
+
+  .no-source {
+    height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-neutral);
+    font-family: var(--font-mono);
+    opacity: 0.5;
+  }
+
+  .preview-content {
+    text-align: center;
+  }
+
+  .preview-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    opacity: 0.2;
+    filter: grayscale(1);
+  }
+
+  .preview-msg {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.4);
+  }
+
+  .preview-msg .prefix {
+    color: var(--color-primary-start);
+    margin-right: 0.5rem;
+  }
+
+  .unit-footer {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .footer-decoration {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--color-neutral-light));
+  }
+
+  .unit-actions {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .action-btn {
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    font-family: var(--font-sans);
+  }
+
+  .action-btn.primary {
+    background: var(--color-primary-start);
+    color: white;
+  }
+
+  .action-btn.primary:hover {
+    background: var(--color-primary-end);
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+  }
+
+  .action-btn.secondary {
+    background: rgba(255,255,255,0.05);
+    color: var(--color-text-title);
+    border: 1px solid var(--glass-border);
+  }
+
+  .action-btn.secondary:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: var(--color-primary-start);
+  }
+
+  @media (max-width: 1024px) {
+    .unit-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .library-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.5rem;
+    }
+    .header-stats {
+      padding-left: 0;
+      border-left: none;
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+</style>
+
+<script>
+  function setupExampleInteractions() {
+    const containers = document.querySelectorAll('.example-container');
+    
+    containers.forEach(container => {
+      const toggleBtn = container.querySelector('.toggle-code');
+      const footerBtn = container.querySelector('.footer-toggle-btn');
+      const sourceArea = container.querySelector('.example-source');
+      const copyBtn = container.querySelector('.copy-code');
+      const arrow = container.querySelector('.arrow');
+
+      const toggleCode = () => {
+        const isActive = sourceArea?.classList.toggle('active');
+        if (arrow) {
+          arrow.style.transform = isActive ? 'rotate(0deg)' : 'rotate(180deg)';
+        }
+      };
+
+      toggleBtn?.addEventListener('click', toggleCode);
+      footerBtn?.addEventListener('click', toggleCode);
+
+      // 复制代码功能
+      copyBtn?.addEventListener('click', async () => {
+        const code = (copyBtn as HTMLElement).dataset.code;
+        if (code) {
+          try {
+            await navigator.clipboard.writeText(code);
+            const originalIcon = copyBtn.querySelector('.btn-icon')!.textContent;
+            copyBtn.querySelector('.btn-icon')!.textContent = '✅';
+            setTimeout(() => {
+              copyBtn.querySelector('.btn-icon')!.textContent = originalIcon;
+            }, 2000);
+          } catch (err) {
+            console.error('Failed to copy code: ', err);
+          }
+        }
+      });
+    });
+  }
+
+  // 初始加载
+  setupExampleInteractions();
+  // 处理 Astro 页面切换
+  document.addEventListener('astro:after-swap', setupExampleInteractions);
+</script>

@@ -1,0 +1,45 @@
+---
+---
+
+<div class="heatmap-preview">
+  <div class="grid">
+    {Array.from({ length: 35 }).map((_, i) => {
+      const level = Math.floor(Math.random() * 5);
+      return <div class={`cell level-${level}`} title={`Level ${level}`}></div>
+    })}
+  </div>
+</div>
+
+<style>
+  .heatmap-preview {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(7, 12px);
+    grid-gap: 4px;
+  }
+
+  .cell {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    background: #161b22;
+    transition: transform 0.2s ease;
+  }
+
+  .cell:hover {
+    transform: scale(1.3);
+    z-index: 2;
+  }
+
+  .level-0 { background: #161b22; }
+  .level-1 { background: #0e4429; }
+  .level-2 { background: #006d32; }
+  .level-3 { background: #26a641; }
+  .level-4 { background: #39d353; }
+</style>

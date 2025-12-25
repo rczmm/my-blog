@@ -1,0 +1,215 @@
+---
+interface Props {
+  class?: string;
+  title?: string;
+  icon?: string;
+  subtitle?: string;
+}
+
+const { 
+  class: className, 
+  title = "Glass Card", 
+  icon = "💎", 
+  subtitle = "Interactive Component" 
+} = Astro.props;
+---
+
+<div class={`glass-card-preview ${className}`}>
+  { (Astro.slots.has('header') || title || icon) && (
+    <div class="card-header">
+      <slot name="header">
+        <div class="header-content">
+          {icon && <span class="header-icon">{icon}</span>}
+          {title && <h3 class="header-title">{title}</h3>}
+        </div>
+      </slot>
+    </div>
+  )}
+
+  { (Astro.slots.has('subheader') || subtitle) && (
+    <div class="card-subheader">
+      <slot name="subheader">
+        <span class="subheader-text">{subtitle}</span>
+      </slot>
+    </div>
+  )}
+
+  <div class="card-content">
+    <slot>
+      <div class="card-demo-content">
+        <p>玻璃拟态 (Glassmorphism) 是一种现代 UI 设计趋势，通过模拟磨砂玻璃的物理特性（如模糊、反射和透明度）来创造深度的层次感。</p>
+        <div class="demo-stats">
+          <div class="stat">
+            <span class="label">Blur</span>
+            <span class="value">12px</span>
+          </div>
+          <div class="stat">
+            <span class="label">Opacity</span>
+            <span class="value">3%</span>
+          </div>
+        </div>
+      </div>
+    </slot>
+  </div>
+
+  { (Astro.slots.has('footer') || true) && (
+    <div class="card-footer">
+      <slot name="footer">
+        <div class="footer-demo-content">
+          <span class="footer-tag">Design System</span>
+          <span class="footer-version">v1.0.4</span>
+        </div>
+      </slot>
+    </div>
+  )}
+</div>
+
+<style>
+  .glass-card-preview {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: var(--glass-border);
+    border-radius: 16px;
+    padding: 1.25rem;
+    box-shadow: var(--glass-shadow);
+    width: 100%;
+    max-width: 320px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .glass-card-preview::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.3),
+      transparent
+    );
+    transition: 0.5s;
+  }
+
+  .glass-card-preview:hover::before {
+    left: 100%;
+  }
+
+  .glass-card-preview:hover {
+    transform: translateY(-5px);
+    border-color: var(--color-primary-start);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  }
+
+  /* Header Styles */
+  .card-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding-bottom: 0.75rem;
+  }
+
+  .header-content {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .header-icon {
+    font-size: 1.2rem;
+    filter: drop-shadow(0 0 8px rgba(var(--color-primary-rgb), 0.3));
+  }
+
+  .header-title {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--color-text-title);
+    letter-spacing: 0.5px;
+  }
+
+  /* Subheader Styles */
+  .card-subheader {
+    font-size: 0.8rem;
+    color: var(--color-neutral);
+    margin-top: -0.25rem;
+    font-family: var(--font-mono);
+  }
+
+  /* Content Styles */
+  .card-content {
+    flex: 1;
+    color: var(--color-text-body);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin: 0.5rem 0;
+  }
+
+  /* Footer Styles */
+  .card-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    padding-top: 0.75rem;
+    margin-top: 0.25rem;
+    font-size: 0.85rem;
+    color: var(--color-neutral);
+  }
+
+  .footer-demo-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-tag {
+    color: var(--color-primary-start);
+    font-weight: 500;
+  }
+
+  .footer-version {
+    opacity: 0.6;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
+
+  .card-demo-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .demo-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    padding: 0.75rem;
+    background: rgba(var(--color-primary-rgb), 0.03);
+    border-radius: 8px;
+    border: 1px solid rgba(var(--color-primary-rgb), 0.05);
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .stat .label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--color-neutral);
+  }
+
+  .stat .value {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-primary-start);
+    font-family: var(--font-mono);
+  }
+</style>

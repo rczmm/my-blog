@@ -1,0 +1,136 @@
+---
+interface Props {
+  text?: string;
+  type?: 'primary' | 'secondary' | 'outline' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
+  shape?: 'square' | 'rounded' | 'pill';
+  class?: string;
+}
+
+const { 
+  text = "PUSH_ME", 
+  type = 'primary', 
+  size = 'md', 
+  shape = 'rounded',
+  class: className 
+} = Astro.props;
+---
+
+<button class:list={[
+  'neo-button-preview',
+  `type-${type}`,
+  `size-${size}`,
+  `shape-${shape}`,
+  className
+]}>
+  <span class="btn-text">{text}</span>
+  <div class="btn-glitch"></div>
+</button>
+
+<style>
+  .neo-button-preview {
+    position: relative;
+    border: none;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    outline: none;
+  }
+
+  /* Sizes */
+  .size-sm {
+    padding: 0.4rem 1rem;
+    font-size: 0.75rem;
+  }
+  .size-md {
+    padding: 0.7rem 1.75rem;
+    font-size: 0.9rem;
+  }
+  .size-lg {
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+  }
+
+  /* Shapes */
+  .shape-square { border-radius: 0; }
+  .shape-rounded { border-radius: 6px; }
+  .shape-pill { border-radius: 9999px; }
+
+  /* Types */
+  .type-primary {
+    background: var(--color-primary-start);
+    color: white;
+    box-shadow: 0 4px 15px rgba(var(--color-primary-rgb), 0.3);
+  }
+  .type-primary:hover {
+    background: var(--color-primary-end);
+    box-shadow: 0 6px 20px rgba(var(--color-primary-rgb), 0.4);
+    transform: translateY(-2px);
+  }
+
+  .type-secondary {
+    background: rgba(var(--color-primary-rgb), 0.1);
+    color: var(--color-primary-start);
+    border: 1px solid rgba(var(--color-primary-rgb), 0.2);
+  }
+  .type-secondary:hover {
+    background: rgba(var(--color-primary-rgb), 0.15);
+    border-color: var(--color-primary-start);
+    transform: translateY(-2px);
+  }
+
+  .type-outline {
+    background: transparent;
+    color: var(--color-primary-start);
+    border: 2px solid var(--color-primary-start);
+  }
+  .type-outline:hover {
+    background: var(--color-primary-start);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  .type-ghost {
+    background: transparent;
+    color: var(--color-text-body);
+  }
+  .type-ghost:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--color-primary-start);
+  }
+
+  .neo-button-preview:active {
+    transform: translateY(0) scale(0.98);
+  }
+
+  .btn-glitch {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.3),
+      transparent
+    );
+    transition: 0.5s;
+  }
+
+  .neo-button-preview:hover .btn-glitch {
+    left: 100%;
+  }
+
+  .btn-text {
+    position: relative;
+    z-index: 1;
+  }
+</style>
