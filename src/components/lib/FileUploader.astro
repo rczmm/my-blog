@@ -1,76 +1,137 @@
 ---
+interface Props {
+  title?: string;
+  maxSize?: string;
+  accept?: string;
+  progress?: number;
+  fileName?: string;
+  status?: 'idle' | 'uploading' | 'success' | 'error';
+  class?: string;
+}
+
+const { 
+  title = "DROP_FILES_HERE",
+  maxSize = "512MB",
+  accept = "*.*",
+  progress = 42,
+  fileName = "DATA_CORE.bin",
+  status = 'uploading',
+  class: className 
+} = Astro.props;
 ---
 
-<div class="file-uploader-preview">
+<div class:list={["file-uploader-preview", className, status]}>
   <div class="upload-zone">
-    <div class="icon">📁</div>
-    <div class="msg">DROP_FILES_HERE</div>
-    <div class="sub-msg">MAX_SIZE: 512MB</div>
-  </div>
-  <div class="upload-progress">
-    <div class="progress-bar">
-      <div class="fill"></div>
+    <div class="icon">
+      {status === 'success' ? '✅' : status === 'error' ? '❌' : '📁'}
     </div>
-    <div class="status">
-      <span class="file-name">DATA_CORE.bin</span>
-      <span class="percent">42%</span>
-    </div>
+    <div class="msg">{title}</div>
+    <div class="sub-msg">MAX_SIZE: {maxSize} | ACCEPT: {accept}</div>
   </div>
+  
+  {(status === 'uploading' || status === 'success') && (
+    <div class="upload-progress">
+      <div class="progress-bar">
+        <div class="fill" style={{ width: `${progress}%` }}></div>
+      </div>
+      <div class="status-info">
+        <span class="file-name">{fileName}</span>
+        <span class="percent">{progress}%</span>
+      </div>
+    </div>
+  )}
 </div>
 
 <style>
   .file-uploader-preview {
-    width: 280px;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px dashed rgba(6, 182, 212, 0.3);
-    border-radius: 8px;
-    padding: 1.5rem;
+    width: 320px;
+    background: var(--glass-bg);
+    border: 2px dashed rgba(var(--color-primary-rgb), 0.2);
+    border-radius: 12px;
+    padding: 1.75rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+
+  .file-uploader-preview:hover {
+    border-color: var(--color-primary-start);
+    background: rgba(var(--color-primary-rgb), 0.05);
   }
 
   .upload-zone {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.75rem;
     margin-bottom: 1.5rem;
-    opacity: 0.6;
+    cursor: pointer;
   }
 
-  .icon { font-size: 2rem; }
+  .icon { 
+    font-size: 2.5rem;
+    filter: drop-shadow(0 0 10px rgba(var(--color-primary-rgb), 0.3));
+  }
+  
   .msg { 
     font-family: var(--font-mono); 
-    font-size: 0.8rem;
+    font-size: 0.9rem;
+    font-weight: 700;
     color: var(--color-primary-start);
+    letter-spacing: 1px;
   }
-  .sub-msg { font-size: 0.6rem; color: var(--color-neutral); }
+  
+  .sub-msg { 
+    font-size: 0.65rem; 
+    color: var(--color-neutral);
+    opacity: 0.8;
+  }
 
   .upload-progress {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.6rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
   }
 
   .progress-bar {
-    height: 4px;
+    height: 6px;
     background: rgba(255, 255, 255, 0.05);
-    border-radius: 2px;
+    border-radius: 3px;
     overflow: hidden;
   }
 
   .fill {
     height: 100%;
-    width: 42%;
-    background: var(--color-primary-start);
-    box-shadow: 0 0 10px var(--color-primary-start);
+    background: linear-gradient(90deg, var(--color-primary-start), var(--color-primary-end));
+    box-shadow: 0 0 15px var(--color-primary-start);
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .status {
+  .status-info {
     display: flex;
     justify-content: space-between;
     font-family: var(--font-mono);
-    font-size: 0.7rem;
+    font-size: 0.75rem;
   }
 
-  .file-name { color: var(--color-neutral); }
-  .percent { color: var(--color-primary-start); }
+  .file-name {
+    color: var(--color-text-body);
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .percent {
+    color: var(--color-primary-start);
+    font-weight: 800;
+  }
+
+  /* Status Variations */
+  .success .msg { color: #10b981; }
+  .success .fill { background: #10b981; box-shadow: 0 0 15px #10b981; }
+  
+  .error { border-color: rgba(239, 68, 68, 0.3); }
+  .error .msg { color: #ef4444; }
 </style>

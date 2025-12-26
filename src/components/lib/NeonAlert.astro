@@ -1,0 +1,152 @@
+---
+interface Props {
+  title?: string;
+  message?: string;
+  type?: 'info' | 'success' | 'warning' | 'error';
+  icon?: string;
+  class?: string;
+}
+
+const { 
+  title = "SYSTEM_NOTIFICATION", 
+  message = "Operation completed successfully. No anomalies detected in the core sectors.", 
+  type = 'info',
+  icon,
+  class: className 
+} = Astro.props;
+
+const defaultIcons = {
+  info: 'ℹ️',
+  success: '✅',
+  warning: '⚠️',
+  error: '🚨'
+};
+
+const currentIcon = icon || defaultIcons[type];
+---
+
+<div class:list={["neon-alert", type, className]}>
+  <div class="alert-glow"></div>
+  <div class="alert-border"></div>
+  <div class="alert-content">
+    <div class="alert-icon">{currentIcon}</div>
+    <div class="alert-text">
+      {title && <div class="alert-title">{title}</div>}
+      <div class="alert-message">{message}</div>
+    </div>
+  </div>
+  <div class="alert-scanline"></div>
+</div>
+
+<style>
+  .neon-alert {
+    position: relative;
+    width: 100%;
+    max-width: 450px;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 1rem 1.25rem;
+    border-radius: 4px;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: flex-start;
+  }
+
+  /* Glow and Border Effects */
+  .alert-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 0% 50%, rgba(var(--alert-rgb), 0.15), transparent 70%);
+    pointer-events: none;
+  }
+
+  .alert-border {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--alert-color);
+    box-shadow: 0 0 15px var(--alert-color);
+  }
+
+  .alert-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .alert-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .alert-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .alert-title {
+    font-family: var(--font-mono);
+    font-weight: 800;
+    font-size: 0.85rem;
+    color: var(--alert-color);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .alert-message {
+    font-size: 0.85rem;
+    color: var(--color-text-body);
+    line-height: 1.5;
+    opacity: 0.9;
+  }
+
+  /* Scanline Animation */
+  .alert-scanline {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      rgba(var(--alert-rgb), 0.05) 50%,
+      transparent
+    );
+    background-size: 100% 4px;
+    pointer-events: none;
+    animation: scanline 10s linear infinite;
+  }
+
+  @keyframes scanline {
+    from { background-position: 0 0; }
+    to { background-position: 0 100%; }
+  }
+
+  /* Types (Colors) */
+  .info { 
+    --alert-color: var(--color-primary-start); 
+    --alert-rgb: var(--color-primary-rgb);
+  }
+  .success { 
+    --alert-color: #10b981; 
+    --alert-rgb: 16, 185, 129;
+  }
+  .warning { 
+    --alert-color: #f59e0b; 
+    --alert-rgb: 245, 158, 11;
+  }
+  .error { 
+    --alert-color: #ef4444; 
+    --alert-rgb: 239, 68, 68;
+  }
+</style>

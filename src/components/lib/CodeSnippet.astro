@@ -1,0 +1,168 @@
+---
+interface Props {
+  code?: string;
+  lang?: string;
+  title?: string;
+  showLineNumbers?: boolean;
+  class?: string;
+}
+
+const { 
+  code = `function initialize() {
+  console.log("System Online");
+  return true;
+}`, 
+  lang = "javascript", 
+  title = "CORE_LOGIC.js",
+  showLineNumbers = true,
+  class: className 
+} = Astro.props;
+
+const lines = code.split('\n');
+---
+
+<div class:list={["code-snippet-preview", className]}>
+  <div class="snippet-header">
+    <div class="header-left">
+      <div class="dots">
+        <span class="dot red"></span>
+        <span class="dot yellow"></span>
+        <span class="dot green"></span>
+      </div>
+      <span class="file-title">{title}</span>
+    </div>
+    <div class="header-right">
+      <span class="lang-tag">{lang}</span>
+      <button class="copy-btn" title="Copy Code">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+      </button>
+    </div>
+  </div>
+  <div class="snippet-body">
+    <pre><code>{lines.map((line, index) => (
+      <div class="line">
+        {showLineNumbers && <span class="line-number">{index + 1}</span>}
+        <span class="line-content">{line}</span>
+      </div>
+    ))}</code></pre>
+  </div>
+</div>
+
+<style>
+  .code-snippet-preview {
+    width: 100%;
+    max-width: 500px;
+    background: var(--glass-bg);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  }
+
+  .snippet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .dots {
+    display: flex;
+    gap: 6px;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .red { background: #ff5f56; }
+  .yellow { background: #ffbd2e; }
+  .green { background: #27c93f; }
+
+  .file-title {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-neutral);
+    letter-spacing: 0.5px;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .lang-tag {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--color-primary-start);
+    text-transform: uppercase;
+    background: rgba(var(--color-primary-rgb), 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 700;
+  }
+
+  .copy-btn {
+    background: transparent;
+    border: none;
+    color: var(--color-neutral);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    opacity: 0.6;
+  }
+
+  .copy-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    opacity: 1;
+    color: var(--color-primary-start);
+  }
+
+  .snippet-body {
+    padding: 1rem 0;
+    overflow-x: auto;
+  }
+
+  pre {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  .line {
+    display: flex;
+    padding: 0 1rem;
+    transition: background 0.2s;
+  }
+
+  .line:hover {
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .line-number {
+    min-width: 2.5rem;
+    color: rgba(255, 255, 255, 0.2);
+    text-align: right;
+    padding-right: 1rem;
+    user-select: none;
+  }
+
+  .line-content {
+    color: var(--color-text-body);
+    white-space: pre;
+  }
+</style>

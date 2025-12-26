@@ -1,0 +1,158 @@
+---
+interface Props {
+  src?: string;
+  size?: 'sm' | 'md' | 'lg';
+  glowColor?: string;
+  scanline?: boolean;
+  class?: string;
+}
+
+const { 
+  src = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&h=200", 
+  size = 'md', 
+  glowColor = "var(--color-primary-start)",
+  scanline = true,
+  class: className 
+} = Astro.props;
+
+const sizeMap = {
+  sm: '60px',
+  md: '100px',
+  lg: '160px'
+};
+---
+
+<div class:list={["hologram-avatar-container", size, className]} style={{ '--glow-color': glowColor, '--avatar-size': sizeMap[size] }}>
+  <div class="avatar-wrapper">
+    <div class="avatar-image" style={{ backgroundImage: `url(${src})` }}></div>
+    <div class="hologram-layer"></div>
+    {scanline && <div class="scanline-layer"></div>}
+    <div class="glitch-layer"></div>
+  </div>
+  <div class="avatar-ring"></div>
+  <div class="avatar-glow"></div>
+</div>
+
+<style>
+  .hologram-avatar-container {
+    position: relative;
+    width: var(--avatar-size);
+    height: var(--avatar-size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .avatar-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    z-index: 2;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .avatar-image {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    filter: saturate(0.5) contrast(1.2) brightness(1.1) sepia(0.2);
+  }
+
+  /* Hologram Effect */
+  .hologram-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      rgba(var(--color-primary-rgb), 0.2) 0%,
+      transparent 100%
+    );
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+
+  .scanline-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      rgba(var(--color-primary-rgb), 0.1) 50%,
+      transparent
+    );
+    background-size: 100% 4px;
+    animation: scanMove 3s linear infinite;
+    pointer-events: none;
+  }
+
+  @keyframes scanMove {
+    from { background-position: 0 0; }
+    to { background-position: 0 100%; }
+  }
+
+  /* Ring and Glow */
+  .avatar-ring {
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border: 1px solid var(--glow-color);
+    border-radius: 50%;
+    opacity: 0.5;
+    animation: rotate 10s linear infinite;
+    z-index: 1;
+  }
+
+  .avatar-ring::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 50%;
+    width: 4px;
+    height: 4px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #fff;
+  }
+
+  .avatar-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--glow-color);
+    filter: blur(25px);
+    opacity: 0.2;
+    border-radius: 50%;
+    z-index: 0;
+  }
+
+  @keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* Glitch on Hover */
+  .hologram-avatar-container:hover .avatar-image {
+    animation: glitch 0.2s infinite;
+  }
+
+  @keyframes glitch {
+    0% { transform: translate(0); }
+    20% { transform: translate(-2px, 1px); filter: hue-rotate(90deg); }
+    40% { transform: translate(2px, -1px); filter: hue-rotate(180deg); }
+    60% { transform: translate(-1px, 2px); filter: hue-rotate(270deg); }
+    80% { transform: translate(1px, -2px); }
+    100% { transform: translate(0); }
+  }
+</style>

@@ -10,25 +10,27 @@ props:
     description: "当前的进度百分比 (0-100)"
   - name: "size"
     type: "number"
-    default: "100"
+    default: "120"
     description: "组件的宽度和高度 (px)"
   - name: "strokeWidth"
     type: "number"
-    default: "8"
+    default: "10"
     description: "进度条的线条粗细"
+  - name: "showText"
+    type: "boolean"
+    default: "true"
+    description: "是否显示中间的百分比文字"
+  - name: "color"
+    type: "string"
+    default: "var(--color-primary-start)"
+    description: "进度条的颜色 (支持 CSS 颜色值)"
 ---
 
 ### 组件特性
-- **SVG 矢量渲染**：无论缩放倍数如何，始终保持清晰的边缘。
-- **平滑动画**：利用 `stroke-dashoffset` 实现进度变化的补间动画。
-- **霓虹发光**：内置 `drop-shadow` 滤镜，增强暗色模式下的视觉表现力。
-- **自动对齐**：文字始终保持在圆环中心，且不受 SVG 旋转影响。
-
-### 技术实现细节
-该组件使用了经典的 SVG 圆环进度原理：
-1.  设置 `stroke-dasharray` 为圆的周长 ($2\pi r$)。
-2.  通过计算偏移量 `stroke-dashoffset` 来控制显示的弧度长度。
-3.  外层容器设置 `transform: rotate(-90deg)` 使起点位于 12 点钟方向。
+- **SVG 渲染**：基于原生 SVG，支持任意缩放而不失真。
+- **平滑动画**：内置 CSS 过渡动画，进度切换自然流畅。
+- **高度定制**：可自由调整粗细、大小、颜色及文字显示。
+- **响应式设计**：适配各种容器尺寸。
 
 ### 使用建议
-建议在数据仪表盘、系统监控面板或文件上传进度等场景下使用。可以配合 `var(--color-primary-start)` 等主题变量来实现颜色的统一。
+适用于展示任务进度、资源占用、仪表盘等场景。可以通过 `color` 参数配合主题变量，实现不同状态（如成功、警告、错误）的视觉反馈。

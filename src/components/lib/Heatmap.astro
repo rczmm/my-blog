@@ -1,45 +1,110 @@
 ---
+interface Props {
+  data?: number[];
+  cellSize?: number;
+  gap?: number;
+  colors?: string[];
+  title?: string;
+}
+
+const { 
+  data = Array.from({ length: 35 }).map(() => Math.floor(Math.random() * 5)),
+  cellSize = 14,
+  gap = 4,
+  colors = ['#161b22', '#0e4429', '#006d32', '#26a641', '#39d353'],
+  title = "Activity Heatmap"
+} = Astro.props;
 ---
 
-<div class="heatmap-preview">
-  <div class="grid">
-    {Array.from({ length: 35 }).map((_, i) => {
-      const level = Math.floor(Math.random() * 5);
-      return <div class={`cell level-${level}`} title={`Level ${level}`}></div>
-    })}
+<div class="heatmap-container">
+  {title && <div class="heatmap-title">{title}</div>}
+  <div class="heatmap-preview">
+    <div class="grid" style={{ 
+      gridTemplateColumns: `repeat(7, ${cellSize}px)`,
+      gap: `${gap}px`
+    }}>
+      {data.map((level, i) => (
+        <div 
+          class={`cell level-${level}`} 
+          style={{ 
+            width: `${cellSize}px`, 
+            height: `${cellSize}px`,
+            backgroundColor: colors[level]
+          }}
+          title={`Level ${level}`}
+        ></div>
+      ))}
+    </div>
+  </div>
+  <div class="heatmap-legend">
+    <span>Less</span>
+    <div class="legend-cells">
+      {colors.map((color, i) => (
+        <div class="legend-cell" style={{ backgroundColor: color }}></div>
+      ))}
+    </div>
+    <span>More</span>
   </div>
 </div>
 
 <style>
+  .heatmap-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1.25rem;
+    background: var(--glass-bg);
+    border: var(--glass-border);
+    border-radius: 12px;
+    box-shadow: var(--glass-shadow);
+  }
+
+  .heatmap-title {
+    font-size: 0.8rem;
+    font-family: var(--font-mono);
+    color: var(--color-neutral);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
   .heatmap-preview {
-    background: rgba(0, 0, 0, 0.2);
-    padding: 1rem;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    justify-content: center;
   }
 
   .grid {
     display: grid;
-    grid-template-columns: repeat(7, 12px);
-    grid-gap: 4px;
   }
 
   .cell {
-    width: 12px;
-    height: 12px;
     border-radius: 2px;
-    background: #161b22;
-    transition: transform 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
   }
 
   .cell:hover {
-    transform: scale(1.3);
+    transform: scale(1.2);
     z-index: 2;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
   }
 
-  .level-0 { background: #161b22; }
-  .level-1 { background: #0e4429; }
-  .level-2 { background: #006d32; }
-  .level-3 { background: #26a641; }
-  .level-4 { background: #39d353; }
+  .heatmap-legend {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    color: var(--color-neutral);
+  }
+
+  .legend-cells {
+    display: flex;
+    gap: 3px;
+  }
+
+  .legend-cell {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+  }
 </style>

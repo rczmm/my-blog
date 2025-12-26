@@ -3,12 +3,16 @@ interface Props {
   percent?: number;
   size?: number;
   strokeWidth?: number;
+  showText?: boolean;
+  color?: string;
 }
 
 const { 
   percent = 75, 
-  size = 100, 
-  strokeWidth = 8 
+  size = 120, 
+  strokeWidth = 10,
+  showText = true,
+  color = 'var(--color-primary-start)'
 } = Astro.props;
 
 const radius = (size / 2) - strokeWidth;
@@ -18,7 +22,7 @@ const offset = circumference - (percent / 100) * circumference;
 ---
 
 <div class="circular-progress-preview">
-  <svg width={size} height={size}>
+  <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
     <circle
       class="bg"
       cx={center}
@@ -34,10 +38,13 @@ const offset = circumference - (percent / 100) * circumference;
       stroke-width={strokeWidth}
       stroke-dasharray={circumference}
       stroke-dashoffset={offset}
+      style={{ stroke: color }}
     />
-    <text x={center} y={center} text-anchor="middle" dominant-baseline="middle" class="text">
-      {percent}%
-    </text>
+    {showText && (
+      <text x={center} y={center} text-anchor="middle" dominant-baseline="middle" class="text">
+        {percent}%
+      </text>
+    )}
   </svg>
 </div>
 
@@ -46,6 +53,7 @@ const offset = circumference - (percent / 100) * circumference;
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
   }
 
   svg {
@@ -58,18 +66,17 @@ const offset = circumference - (percent / 100) * circumference;
   }
 
   .bg {
-    stroke: rgba(255, 255, 255, 0.05);
+    stroke: rgba(var(--color-primary-rgb), 0.05);
   }
 
   .progress {
-    stroke: var(--color-primary-start);
-    filter: drop-shadow(0 0 5px var(--color-primary-start));
-    transition: stroke-dashoffset 1s ease-out;
+    filter: drop-shadow(0 0 8px var(--color-primary-start));
+    transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .text {
     fill: var(--color-text-title);
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     font-weight: 800;
     font-family: var(--font-mono);
     transform: rotate(90deg);

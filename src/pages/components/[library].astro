@@ -75,8 +75,28 @@ const contentMap = Object.fromEntries(componentContents.map(c => [c.id, c]));
       </div>
     </header>
 
-    <div class="components-stack">
-      {library.components.map((comp, index) => {
+    <div class="library-content-wrapper">
+      <!-- 侧边栏目录 -->
+      <aside class="sidebar-toc">
+        <div class="toc-container glass-card">
+          <div class="toc-header">
+            <span class="toc-icon">📋</span>
+            <span class="toc-title">CONTENTS</span>
+          </div>
+          <nav class="toc-nav">
+            {library.components.map((comp, index) => (
+              <a href={`#${comp.id}`} class="toc-link" data-id={comp.id}>
+                <span class="toc-number">0{index + 1}</span>
+                <span class="toc-text">{comp.name.split(' (')[0]}</span>
+              </a>
+            ))}
+          </nav>
+        </div>
+      </aside>
+
+      <!-- 主内容区域 -->
+      <div class="components-stack">
+        {library.components.map((comp, index) => {
         const componentContent = contentMap[comp.id];
         const { Content, data } = componentContent || {};
         const displayName = data?.name || comp.name;
@@ -160,6 +180,7 @@ const contentMap = Object.fromEntries(componentContents.map(c => [c.id, c]));
           </section>
         );
       })}
+      </div>
     </div>
   </div>
 </AetherLayout>
@@ -246,6 +267,111 @@ const contentMap = Object.fromEntries(componentContents.map(c => [c.id, c]));
     color: var(--color-text-body);
     opacity: 0.7;
     max-width: 500px;
+  }
+
+  /* 侧边栏布局优化 */
+  .library-content-wrapper {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 2.5rem;
+    align-items: start;
+  }
+
+  .sidebar-toc {
+    position: sticky;
+    top: 2rem;
+  }
+
+  .toc-container {
+    padding: 1.5rem;
+  }
+
+  .toc-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    margin-bottom: 1rem;
+  }
+
+  .toc-icon { font-size: 1.1rem; }
+  .toc-title {
+    font-family: var(--font-mono);
+    font-weight: 800;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    color: var(--color-neutral);
+  }
+
+  .toc-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .toc-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+  }
+
+  .toc-number {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-primary-start);
+    opacity: 0.6;
+  }
+
+  .toc-text {
+    font-size: 0.9rem;
+    color: var(--color-text-body);
+    font-weight: 500;
+  }
+
+  .toc-link:hover {
+    background: rgba(var(--color-primary-rgb), 0.05);
+    border-color: rgba(var(--color-primary-rgb), 0.1);
+  }
+
+  .toc-link.active {
+    background: rgba(var(--color-primary-rgb), 0.1);
+    border-color: var(--color-primary-start);
+    box-shadow: 0 0 15px rgba(var(--color-primary-rgb), 0.1);
+  }
+
+  .toc-link.active .toc-text {
+    color: var(--color-primary-start);
+  }
+
+  .toc-link.active .toc-number {
+    opacity: 1;
+  }
+
+  /* 主内容区域优化 */
+  .components-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 5rem;
+    padding-bottom: 5rem;
+  }
+
+  .component-section {
+    scroll-margin-top: 2rem;
+  }
+
+  @media (max-width: 1024px) {
+    .library-content-wrapper {
+      grid-template-columns: 1fr;
+    }
+    .sidebar-toc {
+      display: none;
+    }
   }
 
   .header-stats {
@@ -769,7 +895,30 @@ const contentMap = Object.fromEntries(componentContents.map(c => [c.id, c]));
 </style>
 
 <script>
-  function setupExampleInteractions() {
+  // 滚动监听 (Scroll Spy)
+  const observerOptions = {
+    root: null,
+    rootMargin: '-10% 0px -80% 0px',
+    threshold: 0
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.getAttribute('id');
+        document.querySelectorAll('.toc-link').forEach(link => {
+          link.classList.toggle('active', link.getAttribute('data-id') === id);
+        });
+      }
+    });
+  }, observerOptions);
+
+  function setupInteractions() {
+    // 启动滚动监听
+    document.querySelectorAll('.component-section').forEach(section => {
+      observer.observe(section);
+    });
+
     const containers = document.querySelectorAll('.example-container');
     
     containers.forEach(container => {
@@ -795,11 +944,12 @@ const contentMap = Object.fromEntries(componentContents.map(c => [c.id, c]));
         if (code) {
           try {
             await navigator.clipboard.writeText(code);
-            const originalIcon = copyBtn.querySelector('.btn-icon')!.textContent;
-            copyBtn.querySelector('.btn-icon')!.textContent = '✅';
-            setTimeout(() => {
-              copyBtn.querySelector('.btn-icon')!.textContent = originalIcon;
-            }, 2000);
+            const icon = copyBtn.querySelector('.btn-icon');
+            if (icon) {
+              const originalIcon = icon.textContent;
+              icon.textContent = '✅';
+              setTimeout(() => { icon.textContent = originalIcon; }, 2000);
+            }
           } catch (err) {
             console.error('Failed to copy code: ', err);
           }
@@ -809,7 +959,7 @@ const contentMap = Object.fromEntries(componentContents.map(c => [c.id, c]));
   }
 
   // 初始加载
-  setupExampleInteractions();
+  setupInteractions();
   // 处理 Astro 页面切换
-  document.addEventListener('astro:after-swap', setupExampleInteractions);
+  document.addEventListener('astro:after-swap', setupInteractions);
 </script>

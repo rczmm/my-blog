@@ -1,0 +1,111 @@
+---
+interface Props {
+  text?: string;
+  type?: 'primary' | 'success' | 'warning' | 'error' | 'neutral';
+  variant?: 'solid' | 'outline' | 'glitch';
+  size?: 'xs' | 'sm' | 'md';
+  class?: string;
+}
+
+const { 
+  text = "STABLE", 
+  type = 'primary', 
+  variant = 'outline',
+  size = 'sm',
+  class: className 
+} = Astro.props;
+---
+
+<span class:list={["cyber-badge", type, variant, size, className]}>
+  <span class="badge-content">{text}</span>
+  {variant === 'glitch' && <span class="badge-glitch" aria-hidden="true">{text}</span>}
+</span>
+
+<style>
+  .cyber-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 10px;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 2px;
+    position: relative;
+    white-space: nowrap;
+    user-select: none;
+    font-size: 0.7rem;
+  }
+
+  /* Sizes */
+  .xs { padding: 1px 6px; font-size: 0.6rem; }
+  .sm { padding: 2px 10px; font-size: 0.7rem; }
+  .md { padding: 4px 14px; font-size: 0.8rem; }
+
+  /* Types (Colors) */
+  .primary { 
+    --badge-color: var(--color-primary-start); 
+    --badge-rgb: var(--color-primary-rgb);
+  }
+  .success { 
+    --badge-color: #10b981; 
+    --badge-rgb: 16, 185, 129;
+  }
+  .warning { 
+    --badge-color: #f59e0b; 
+    --badge-rgb: 245, 158, 11;
+  }
+  .error { 
+    --badge-color: #ef4444; 
+    --badge-rgb: 239, 68, 68;
+  }
+  .neutral { 
+    --badge-color: var(--color-neutral); 
+    --badge-rgb: 156, 163, 175;
+  }
+
+  /* Variants */
+  .solid {
+    background: var(--badge-color);
+    color: #000;
+    box-shadow: 0 0 10px rgba(var(--badge-rgb), 0.3);
+  }
+
+  .outline {
+    background: rgba(var(--badge-rgb), 0.1);
+    border: 1px solid var(--badge-color);
+    color: var(--badge-color);
+    box-shadow: inset 0 0 5px rgba(var(--badge-rgb), 0.2);
+  }
+
+  .glitch {
+    background: transparent;
+    border: 1px solid var(--badge-color);
+    color: var(--badge-color);
+    overflow: hidden;
+  }
+
+  .badge-glitch {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--badge-color);
+    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateX(-101%);
+    transition: transform 0.3s cubic-bezier(0.7, 0, 0.3, 1);
+  }
+
+  .cyber-badge:hover .badge-glitch {
+    transform: translateX(0);
+  }
+
+  .badge-content {
+    position: relative;
+    z-index: 1;
+  }
+</style>

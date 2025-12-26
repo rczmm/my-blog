@@ -1,0 +1,102 @@
+---
+interface Props {
+  speed?: number;
+  fontSize?: number;
+  color?: string;
+  density?: number;
+  class?: string;
+}
+
+const { 
+  speed = 1, 
+  fontSize = 14, 
+  color = "var(--color-primary-start)",
+  density = 0.5,
+  class: className 
+} = Astro.props;
+---
+
+<div class:list={["digital-rain-container", className]}>
+  <canvas id="digitalRainCanvas"></canvas>
+  <div class="overlay"></div>
+</div>
+
+<script define:vars={{ speed, fontSize, color, density }}>
+  const canvas = document.getElementById('digitalRainCanvas');
+  const ctx = canvas.getContext('2d');
+
+  let width, height, columns;
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$+-*/=%\"'#&_(),.;:?!\\|{}<>[]^~";
+  let drops = [];
+
+  function init() {
+    width = canvas.parentElement.offsetWidth;
+    height = canvas.parentElement.offsetHeight;
+    canvas.width = width;
+    canvas.height = height;
+
+    columns = Math.floor(width / fontSize);
+    drops = [];
+    for (let i = 0; i < columns; i++) {
+      drops[i] = Math.random() * -height;
+    }
+  }
+
+  function draw() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+    ctx.fillRect(0, 0, width, height);
+
+    ctx.fillStyle = color;
+    ctx.font = `${fontSize}px monospace`;
+
+    for (let i = 0; i < drops.length; i++) {
+      if (Math.random() > (1 - density)) {
+        const text = chars[Math.floor(Math.random() * chars.length)];
+        ctx.fillText(text, i * fontSize, drops[i]);
+      }
+
+      drops[i] += fontSize * speed;
+
+      if (drops[i] > height && Math.random() > 0.975) {
+        drops[i] = 0;
+      }
+    }
+  }
+
+  init();
+  let interval = setInterval(draw, 33);
+
+  window.addEventListener('resize', () => {
+    init();
+  });
+</script>
+
+<style>
+  .digital-rain-container {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    background: #000;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid rgba(var(--color-primary-rgb), 0.2);
+  }
+
+  canvas {
+    display: block;
+  }
+
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      rgba(0, 0, 0, 0.2) 50%,
+      transparent 50%
+    );
+    background-size: 100% 4px;
+    pointer-events: none;
+  }
+</style>
