@@ -223,6 +223,60 @@ const recentPosts = sortedPosts.slice(0, 3);
       behavior: 'smooth'
     });
   });
+
+  // Mermaid 图表支持
+  import mermaid from 'mermaid';
+  
+  const initMermaid = async () => {
+    // 寻找由 Markdown 渲染出来的 mermaid 代码块
+    // Astro 默认使用 Shiki，可能会将代码包裹在 pre.astro-code 或类似的容器中
+    // 我们需要寻找包含 mermaid 类的代码块
+    const mermaidBlocks = document.querySelectorAll('pre.mermaid, .language-mermaid');
+    
+    if (mermaidBlocks.length > 0) {
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'dark',
+        securityLevel: 'loose',
+        fontFamily: 'Inter, var(--font-sans)',
+        themeVariables: {
+          primaryColor: '#06b6d4',
+          primaryTextColor: '#fff',
+          primaryBorderColor: '#06b6d4',
+          lineColor: '#06b6d4',
+          secondaryColor: '#0891b2',
+          tertiaryColor: '#164e63'
+        }
+      });
+
+      for (const block of mermaidBlocks) {
+        let code = '';
+        let targetElement = block;
+
+        // 如果是 pre > code 结构
+        if (block.tagName === 'CODE') {
+          code = block.textContent || '';
+          targetElement = block.parentElement || block;
+        } else {
+          code = block.textContent || '';
+        }
+
+        const container = document.createElement('div');
+        container.className = 'mermaid-container glass-card';
+        
+        const mermaidDiv = document.createElement('div');
+        mermaidDiv.className = 'mermaid';
+        mermaidDiv.textContent = code;
+        
+        container.appendChild(mermaidDiv);
+        targetElement.replaceWith(container);
+      }
+      
+      await mermaid.run();
+    }
+  };
+
+  initMermaid();
 </script>
 
 <style>
@@ -955,5 +1009,24 @@ const recentPosts = sortedPosts.slice(0, 3);
   .recent-date {
     font-size: 0.8rem;
     color: var(--color-neutral);
+  }
+
+  /* Mermaid 图表容器样式 */
+  .mermaid-container {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: center;
+    background: rgba(15, 23, 42, 0.5);
+    overflow-x: auto;
+  }
+
+  .mermaid {
+    background: transparent !important;
+  }
+
+  .mermaid svg {
+    max-width: 100%;
+    height: auto;
   }
 </style>
