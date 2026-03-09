@@ -17,6 +17,19 @@ const componentsCollection = defineCollection({
   }),
 });
 
+const novelsCollection = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    author: z.string(),
+    cover: z.string().optional(),
+    description: z.string(),
+    pubDate: z.date(),
+    tags: z.array(z.string()).optional(),
+  }),
+});
+
 export const collections = {
   'components': componentsCollection,
+  'novels': novelsCollection,
 };
